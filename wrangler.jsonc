@@ -1,5 +1,13 @@
 {
-  "name": "worker-test",
-  "main": "./.output/server/index.mjs",
-  "compatibility_date": "2025-11-12"
+	"name": "worker-test",
+	"main": "./.output/server/index.mjs",
+	"compatibility_date": "2025-11-12",
+	"d1_databases": [
+		{
+			"binding": "db",
+			"database_name": "worker-test",
+			"database_id": "50667758-7490-4374-b1c3-13338a3332d0",
+			"remote": true
+		}
+	]
 }
