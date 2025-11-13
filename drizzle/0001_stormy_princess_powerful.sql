@@ -1,0 +1,1 @@
+ALTER TABLE `fruits` ADD `color` text NOT NULL;

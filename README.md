@@ -1,75 +1,22 @@
-# Nuxt Minimal Starter
+This app is me testing and setting up the basics of Nuxt + Drizzle kit
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+You can build using Sqlite + Nuxt + Drizzle ORM.
 
-## Setup
+It is configured to be deployed with Cloudflare's D1 and Worker.
 
-Make sure to install dependencies:
+# How to modify tables
 
-```bash
-# npm
-npm install
+1. Edit `server/db/schema.ts` to what you need.
+2. Run
 
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
+```
+npx drizzle-kit generate
 ```
 
-## Development Server
+and check the new migration file it created in the `drizzle` folder.
 
-Start the development server on `http://localhost:3000`:
+3. Then migrate with
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+npx drizzle-kit migrate
 ```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
