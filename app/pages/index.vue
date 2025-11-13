@@ -13,7 +13,7 @@
       <h1>Not logged in</h1>
       <UButton
         v-if="!loggedIn"
-        to="/api/auth/line"
+        :to="lineLoginUrl"
         icon="i-simple-icons-line"
         label="Login with line"
         color="neutral"
@@ -26,4 +26,13 @@
 
 <script setup lang="ts">
 const { loggedIn, user, session, clear } = useUserSession();
+
+// Generate a random state parameter for Line OAuth security
+const lineLoginUrl = computed(() => {
+  // Create a random string for CSRF protection
+  const state =
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15);
+  return `/api/auth/line?state=${state}`;
+});
 </script>
