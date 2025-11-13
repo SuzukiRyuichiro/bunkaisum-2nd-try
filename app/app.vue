@@ -1,5 +1,6 @@
 <template>
   <div>
-    <h1>hey</h1>
+    <p class="font-semibold">yo</p>
+    <UAlert title="Heads up!" />
   </div>
 </template>
