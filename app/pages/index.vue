@@ -5,6 +5,7 @@
 
     <div v-if="loggedIn">
       <h1>Welcome {{ user.name }}!</h1>
+      <h1>{{ user }}</h1>
       <p>Logged in since {{ session?.loggedInAt }}</p>
       <button @click="clear">Logout</button>
     </div>
@@ -12,9 +13,9 @@
       <h1>Not logged in</h1>
       <UButton
         v-if="!loggedIn"
-        to="/api/auth/facebook"
-        icon="i-simple-icons-facebook"
-        label="Login with Facebook"
+        to="/api/auth/line"
+        icon="i-simple-icons-line"
+        label="Login with line"
         color="neutral"
         size="xs"
         external
