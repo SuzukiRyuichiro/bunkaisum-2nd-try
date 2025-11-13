@@ -8,3 +8,4 @@ export default function useDrizzle(event: H3Event) {
 }
 
 export type Fruit = typeof schema.fruitsTable.$inferSelect;
+export type Expense = typeof schema.expensesTable.$inferSelect;
