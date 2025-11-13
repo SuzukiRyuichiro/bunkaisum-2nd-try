@@ -8,7 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "deploy": "nuxt build && npx wrangler --cwd .output deploy"
+    "deploy": "nuxt build && npx wrangler --cwd .output deploy",
+    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
