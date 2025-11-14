@@ -4,10 +4,12 @@
     <UAlert title="Heads up!" />
 
     <div v-if="loggedIn">
-      <h1>Welcome {{ user.name }}!</h1>
+      <h1>Welcome {{ user?.name }}!</h1>
       <h1>{{ user }}</h1>
+      <UAvatar :src="user?.pictureUrl" size="xl" />
+
       <p>Logged in since {{ session?.loggedInAt }}</p>
-      <button @click="clear">Logout</button>
+      <UButton @click="clear">Logout</UButton>
     </div>
     <div v-else>
       <h1>Not logged in</h1>
@@ -27,9 +29,7 @@
 <script setup lang="ts">
 const { loggedIn, user, session, clear } = useUserSession();
 
-// Generate a random state parameter for Line OAuth security
 const lineLoginUrl = computed(() => {
-  // Create a random string for CSRF protection
   const state =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
