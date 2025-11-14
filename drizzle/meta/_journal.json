@@ -22,6 +22,34 @@
       "when": 1763010863744,
       "tag": "0002_brown_shinobi_shaw",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1763087628865,
+      "tag": "0003_gigantic_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1763089821770,
+      "tag": "0004_tidy_dark_phoenix",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1763089994419,
+      "tag": "0005_black_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1763090073105,
+      "tag": "0006_nostalgic_captain_marvel",
+      "breakpoints": true
     }
   ]
 }

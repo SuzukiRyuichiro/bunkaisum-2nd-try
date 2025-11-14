@@ -1,19 +1,61 @@
-import { sql } from "drizzle-orm";
-import { timestamp } from "drizzle-orm/gel-core";
+import { relations, sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const fruitsTable = sqliteTable("fruits", {
-  id: int().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
-  color: text().notNull(),
-});
-
-export const expensesTable = sqliteTable("expenses", {
-  id: int().primaryKey({ autoIncrement: true }),
-  title: text().notNull(),
-  totalAmount: int().notNull().default(0),
+const timestamps = {
   createdAt: int("createdAt", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
-  paidAt: int("paidAt", { mode: "timestamp" }).notNull(),
+  updatedAt: int("updatedAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => new Date()),
+};
+
+export const expensesTable = sqliteTable("expenses", {
+  id: int().primaryKey({ autoIncrement: true }),
+  title: text(),
+  totalAmount: int().default(0),
+  paidAt: int("paidAt", { mode: "timestamp" }),
+  userId: int("userId").references(() => usersTable.id),
+  ...timestamps,
 });
+
+export const usersTable = sqliteTable("users", {
+  id: int().primaryKey({ autoIncrement: true }),
+  displayName: text(),
+  ...timestamps,
+});
+
+export const oAuthAccountsTable = sqliteTable("oAuthAccounts", {
+  id: int().primaryKey({ autoIncrement: true }),
+  provider: text(),
+  providerUserId: text(),
+  accessToken: text(),
+  refreshToken: text(),
+  expiresAt: int("expiresAt", { mode: "timestamp" }),
+  userId: int("userId").references(() => usersTable.id),
+  ...timestamps,
+});
+
+// Relations
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  expenses: many(expensesTable),
+  oAuthAccounts: many(oAuthAccountsTable),
+}));
+
+export const expensesRelations = relations(expensesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [expensesTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const oAuthAccountsRelations = relations(
+  oAuthAccountsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [oAuthAccountsTable.userId],
+      references: [usersTable.id],
+    }),
+  })
+);
