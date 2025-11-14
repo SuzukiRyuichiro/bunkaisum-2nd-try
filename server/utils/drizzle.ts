@@ -7,5 +7,6 @@ export default function useDrizzle(event: H3Event) {
   return drizzle(db, { schema });
 }
 
-export type Fruit = typeof schema.fruitsTable.$inferSelect;
 export type Expense = typeof schema.expensesTable.$inferSelect;
+export type User = typeof schema.usersTable.$inferSelect;
+export type OAuthAccounts = typeof schema.oAuthAccountsTable.$inferSelect;

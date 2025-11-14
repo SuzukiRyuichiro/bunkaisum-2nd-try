@@ -1,5 +1,4 @@
-import { sql } from "drizzle-orm";
-import { timestamp } from "drizzle-orm/gel-core";
+import { relations, sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
@@ -17,6 +16,7 @@ export const expensesTable = sqliteTable("expenses", {
   title: text(),
   totalAmount: int().default(0),
   paidAt: int("paidAt", { mode: "timestamp" }),
+  userId: int("userId").references(() => usersTable.id),
   ...timestamps,
 });
 
@@ -26,7 +26,7 @@ export const usersTable = sqliteTable("users", {
   ...timestamps,
 });
 
-export const oauthAccountsTable = sqliteTable("oauthAccounts", {
+export const oAuthAccountsTable = sqliteTable("oAuthAccounts", {
   id: int().primaryKey({ autoIncrement: true }),
   provider: text(),
   providerUserId: text(),
@@ -36,3 +36,26 @@ export const oauthAccountsTable = sqliteTable("oauthAccounts", {
   userId: int("userId").references(() => usersTable.id),
   ...timestamps,
 });
+
+// Relations
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  expenses: many(expensesTable),
+  oAuthAccounts: many(oAuthAccountsTable),
+}));
+
+export const expensesRelations = relations(expensesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [expensesTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const oAuthAccountsRelations = relations(
+  oAuthAccountsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [oAuthAccountsTable.userId],
+      references: [usersTable.id],
+    }),
+  })
+);

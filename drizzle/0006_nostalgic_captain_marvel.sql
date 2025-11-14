@@ -1,0 +1,1 @@
+ALTER TABLE `expenses` ADD `userId` integer REFERENCES users(id);

@@ -1,10 +1,16 @@
+import { findOrCreateUserFromOAuth } from "~~/server/utils/auth";
+
 export default defineOAuthLineEventHandler({
-  onError(event) {
-    console.log(event);
-  },
   async onSuccess(event, { user }) {
-    await setUserSession(event, { user });
-    // TODO: change the link later
+    // here, find or create user with OAuth
+    const ourUser = await findOrCreateUserFromOAuth({
+      event,
+      profile: user,
+      provider: "line",
+    });
+
+    await setUserSession(event, { user: ourUser });
+
     return sendRedirect(event, "/");
   },
 });
