@@ -8,14 +8,15 @@ const timestamps = {
   updatedAt: int("updatedAt", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`)
-    .$onUpdate(() => new Date()),
+    .$onUpdateFn(() => new Date())
+    .$type<Date>(),
 };
 
 export const expensesTable = sqliteTable("expenses", {
   id: int().primaryKey({ autoIncrement: true }),
   title: text(),
   totalAmount: int().default(0),
-  paidAt: int("paidAt", { mode: "timestamp" }),
+  paidAt: text("paidAt"), // Store as "YYYY-MM-DD" string
   userId: int("userId").references(() => usersTable.id),
   ...timestamps,
 });
