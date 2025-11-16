@@ -1,5 +1,6 @@
 <template>
   <UApp :toaster="toaster">
+    <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -7,5 +8,7 @@
 </template>
 
 <script setup lang="ts">
-const toaster = { position: "bottom-right" };
+import type { ToasterProps } from "@nuxt/ui";
+
+const toaster: ToasterProps = { position: "bottom-right" };
 </script>

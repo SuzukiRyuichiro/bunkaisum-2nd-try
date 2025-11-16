@@ -1,3 +1,4 @@
+import { useToast } from "@nuxt/ui/runtime/composables/useToast.js";
 import { expensesTable } from "~~/server/db/schema";
 import useDrizzle, { Expense } from "~~/server/utils/drizzle";
 
@@ -8,8 +9,10 @@ export default defineEventHandler(async (event) => {
 
   if (!expense) return;
   const { user } = await requireUserSession(event);
-  const [newExpense] = await db
+
+  const newExpense = await db
     .insert(expensesTable)
     .values({ userId: user.id, ...expense });
+
   return { newExpense };
 });

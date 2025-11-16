@@ -16,6 +16,7 @@ export const expensesTable = sqliteTable("expenses", {
   id: int().primaryKey({ autoIncrement: true }),
   title: text(),
   totalAmount: int().default(0),
+  emoji: text(),
   paidAt: text("paidAt"), // Store as "YYYY-MM-DD" string
   userId: int("userId").references(() => usersTable.id),
   ...timestamps,

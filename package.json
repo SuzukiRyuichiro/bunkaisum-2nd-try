@@ -9,15 +9,17 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "deploy": "nuxt build && npx wrangler --cwd .output deploy",
-    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:generate": "npx drizzle-kit generate:sqlite",
     "drizzle:migrate": "npx drizzle-kit migrate",
-    "drizzle:studio": "npx drizzle-kit studio"
+    "drizzle:studio": "npx drizzle-kit studio",
+    "drizzle:seed": "tsx drizzle/seed.ts"
   },
   "dependencies": {
     "@nuxt/icon": "^2.1.0",
     "@nuxt/ui": "^4.1.0",
     "better-sqlite3": "^12.4.1",
     "drizzle-orm": "^0.44.7",
+    "drizzle-seed": "^0.3.1",
     "nuxt": "^4.2.1",
     "nuxt-auth-utils": "^0.5.25",
     "typescript": "^5.9.3",
@@ -26,7 +28,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "drizzle-kit": "^0.31.6",
+    "drizzle-kit": "^0.18.1",
     "nitro-cloudflare-dev": "^0.2.2",
     "wrangler": "^4.47.0"
   }
