@@ -5,7 +5,7 @@
   >
     <div class="flex items-center gap-4">
       <div class="text-3xl">
-        {{ expense?.emoji == "" ? expense?.emoji : "🤑" }}
+        {{ expense?.emoji || "🤑" }}
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-slate-900">{{ expense?.title }}</div>
