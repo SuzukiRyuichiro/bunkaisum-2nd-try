@@ -57,6 +57,13 @@
       "when": 1763116402399,
       "tag": "0007_gifted_corsair",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1763349023511,
+      "tag": "0008_safe_titania",
+      "breakpoints": true
     }
   ]
 }

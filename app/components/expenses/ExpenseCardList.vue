@@ -12,12 +12,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { ExpenseWithUser } from "~~/server/utils/drizzle";
 import ExpenseCard from "./ExpenseCard.vue";
 
-const expenses = ref<ExpenseWithUser[]>([]);
+const expenses = ref([]);
 
-const { expenses: responseExpenses } = await $fetch("/api/expenses");
+onMounted(async () => {
+  const response = await useFetch("/api/expenses");
 
-expenses.value = responseExpenses;
+  expenses.value = response.data.value?.expenses;
+});
 </script>

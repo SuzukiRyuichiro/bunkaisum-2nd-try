@@ -6,7 +6,3 @@
   --ui-radius: 0.5rem;
   --ui-bg: var(--color-slate-50);
 }
-
-.dark {
-  --ui-primary: white;
-}

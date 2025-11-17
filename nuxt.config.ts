@@ -25,4 +25,7 @@ export default defineNuxtConfig({
       nodeCompat: true,
     },
   },
+  ui: {
+    colorMode: false,
+  },
 });
