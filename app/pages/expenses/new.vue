@@ -5,31 +5,87 @@
       http-equiv="origin-trial"
       content="Ay9zgWOzVsfIJ97aKTvjzn6TAUKOKShK05ozaYMbNhuW67sq9wyY97qdI6Bqp28kmUjZrevZzrKIw/kP0h2aagYAAACOeyJvcmlnaW4iOiJodHRwczovL3J5dWljaGlyb3N1enVraS5jb206NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="
     />
-    <h1>新しい支払いを記録する</h1>
-    <UForm>
+    <UButton @click="router.go(-1)" icon="i-lucide-arrow-left" variant="ghost"
+      >戻る</UButton
+    >
+    <div class="py-4">
+      <h1 class="text-lg font-semibold">新しい支払いを記録する</h1>
+    </div>
+    <UForm class="grid gap-4">
+      <progress ref="progress" hidden="" id="progress" value="0"></progress>
       <UCard>
         <UFormField label="件名" name="title">
-          <UInput v-model="state.title" @change="suggestEmoji" />
+          <UInput
+            class="w-full"
+            size="lg"
+            v-model="formState.title"
+            @change="suggestEmoji"
+            placeholder="例: 目黒のランチ"
+          />
         </UFormField>
       </UCard>
 
-      <progress ref="progress" hidden="" id="progress" value="0"></progress>
-
       <UCard>
-        <template #header>
-          <h2>絵文字を選んでね</h2>
-          <p v-if="config.public.enableEmojiSuggestions">
-            ChromeでやるとAIが勝手に選んでくれるはず
-          </p>
-        </template>
+        <p v-if="config.public.enableEmojiSuggestions">
+          ChromeでやるとAIが勝手に選んでくれるはず
+        </p>
         <URadioGroup
           indicator="hidden"
+          legend="絵文字を選んでね"
           variant="card"
+          size="md"
+          :ui="{ item: 'text-3xl', fieldset: 'flex-wrap' }"
           default-value="System"
           orientation="horizontal"
-          v-model="state.emoji"
+          v-model="formState.emoji"
           :items="items"
         />
+      </UCard>
+      <UCard>
+        <UFormField label="合計額" name="total amount">
+          <UInputNumber
+            class="w-full"
+            :min="0"
+            size="lg"
+            v-model="formState.totalAmount"
+            :format-options="{
+              style: 'currency',
+              currency: 'JPY',
+              currencyDisplay: 'code',
+            }"
+          />
+        </UFormField>
+      </UCard>
+
+      <UCard>
+        <UFormField label="支払った人" name="paid by">
+          <USelect
+            placeholder="一人選んでください"
+            size="lg"
+            class="w-full"
+            v-model="formState.userId"
+            value-key="id"
+            :items="users.map((u) => ({ id: u.id, label: u.displayName }))"
+          />
+        </UFormField>
+      </UCard>
+      <UCard>
+        <UCheckboxGroup
+          legend="割り勘"
+          v-model="formState.participants"
+          :items="users"
+          value-key="id"
+          :ui="{
+            item: 'items-center',
+          }"
+        >
+          <template #label="{ item }">
+            <div class="flex gap-4 items-center">
+              <UAvatar src="https://github.com/benjamincanac.png" />
+              <p>{{ item?.displayName }}</p>
+            </div>
+          </template>
+        </UCheckboxGroup>
       </UCard>
     </UForm>
   </div>
@@ -39,9 +95,17 @@
 const router = useRouter();
 const config = useRuntimeConfig();
 
-const state = ref({});
+const { data: users } = await useFetch("/api/users");
 
-const items = ["🍕", "☕️", "🧻", "✈️", "💸"];
+const formState = ref({
+  totalAmount: 0,
+  emoji: "",
+  title: "",
+  userId: null,
+  participants: users.value?.map((u) => u.id),
+});
+
+const items = ["🍕", "☕️", "🧻", "✈️", "🛒", "🎉", "💸"];
 
 // Will not use for now
 let sessionCreationTriggered = false;
@@ -124,7 +188,7 @@ const suggestEmoji = async () => {
 
   try {
     const prompt = `もしこの中の絵文字から"${
-      state.value.title
+      formState.value.title
     }"という文章を総括する様な絵文字を選ぶとしたら、どれを選ぶ？ 絵文字はこれら ${items.join(
       ", "
     )}。インデックスで答えてほしい ${items
@@ -135,7 +199,7 @@ const suggestEmoji = async () => {
       responseConstraint: { type: "integer" },
     });
 
-    state.value.emoji = items[parseInt(result)];
+    formState.value.emoji = items[parseInt(result)];
   } catch (err) {
     console.error(err);
   }
