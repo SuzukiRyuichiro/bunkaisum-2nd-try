@@ -1,17 +1,11 @@
 <template>
   <div class="py-4">
     <Meta
+      v-if="config.public.enableEmojiSuggestions"
       http-equiv="origin-trial"
-      content="AwORxaXj4VOThHQyBt34bbc0gH3tURXD5Smyyj3/ZViATdEobJt1tmo7/iI5O6xjl2JTQKdawqz2HL5Cx4V2CwYAAACUeyJvcmlnaW4iOiJodHRwczovL3NwbGl0LnJ5dWljaGlyb3N1enVraS5jb206NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="
+      content="Ay9zgWOzVsfIJ97aKTvjzn6TAUKOKShK05ozaYMbNhuW67sq9wyY97qdI6Bqp28kmUjZrevZzrKIw/kP0h2aagYAAACOeyJvcmlnaW4iOiJodHRwczovL3J5dWljaGlyb3N1enVraS5jb206NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="
     />
-    <UButton
-      icon="i-lucide-arrow-left"
-      variant="ghost"
-      @click="() => router.go(-1)"
-      >Back</UButton
-    >
     <h1>新しい支払いを記録する</h1>
-
     <UForm>
       <UCard>
         <UFormField label="件名" name="title">
@@ -24,7 +18,9 @@
       <UCard>
         <template #header>
           <h2>絵文字を選んでね</h2>
-          <p>ChromeでやるとAIが勝手に選んでくれるはず</p>
+          <p v-if="config.public.enableEmojiSuggestions">
+            ChromeでやるとAIが勝手に選んでくれるはず
+          </p>
         </template>
         <URadioGroup
           indicator="hidden"
@@ -41,27 +37,28 @@
 
 <script setup lang="ts">
 const router = useRouter();
+const config = useRuntimeConfig();
 
 const state = ref({});
 
 const items = ["🍕", "☕️", "🧻", "✈️", "💸"];
 
+// Will not use for now
 let sessionCreationTriggered = false;
 let localSession = null;
-
 const createSession = async (options = {}) => {
   if (sessionCreationTriggered) {
     return;
   }
 
   // Only run on client-side, not during SSR
-  if (LanguageModel) {
+  if (typeof window === "undefined" || !window.LanguageModel) {
     console.log("LanguageModel API not available");
     return null;
   }
 
   try {
-    const availability = await LanguageModel.availability();
+    const availability = await window.LanguageModel.availability();
     if (availability === "unavailable") {
       throw new Error("LanguageModel is not available.");
     }
@@ -73,7 +70,7 @@ const createSession = async (options = {}) => {
     console.log(`LanguageModel is ${availability}.`);
     sessionCreationTriggered = true;
 
-    const llmSession = await LanguageModel.create({
+    const llmSession = await window.LanguageModel.create({
       monitor(m) {
         m.addEventListener("downloadprogress", (e) => {
           console.log(`Downloaded ${e.loaded * 100}%`);
@@ -89,8 +86,16 @@ const createSession = async (options = {}) => {
 };
 
 const suggestEmoji = async () => {
+  if (!config.public.enableEmojiSuggestions) {
+    // feature flag
+    console.log(
+      "Please turn on the feature flag if you wish AI to suggest emoji"
+    );
+    return;
+  }
+
   // Only run on client-side
-  if (LanguageModel) {
+  if (typeof window === "undefined" || !window.LanguageModel) {
     console.log("LanguageModel API not available - skipping emoji suggestion");
     return;
   }

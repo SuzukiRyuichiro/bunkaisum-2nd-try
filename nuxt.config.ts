@@ -17,6 +17,9 @@ export default defineNuxtConfig({
         clientSecret: process.env.NUXT_OAUTH_FACEBOOK_APP_SECRET,
       },
     },
+    public: {
+      enableEmojiSuggestions: false,
+    },
   },
   nitro: {
     preset: "cloudflare-module",
