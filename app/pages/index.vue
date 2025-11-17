@@ -1,5 +1,5 @@
 <template>
-  <UContainer>
+  <div>
     <!-- Header -->
     <div class="px-6 py-8">
       <div class="flex items-center gap-3">
@@ -11,14 +11,14 @@
       </div>
     </div>
     <!-- Tabs -->
-    <UTabs :items="items" color="primary">
+    <UTabs :items="items" color="primary" :unmount-on-hide="false">
       <template #expenses>
-        <ExpensesExpenseCardList />
+        <ExpensesTab class="pt-4" />
       </template>
 
       <template #balance></template>
     </UTabs>
-  </UContainer>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -3,6 +3,6 @@
 
 :root {
   --ui-primary: var(--color-slate-900);
-  --ui-radius: 0.5rem;
+  --ui-radius: 0.25rem;
   --ui-bg: var(--color-slate-50);
 }
