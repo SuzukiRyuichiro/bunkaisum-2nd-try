@@ -17,8 +17,9 @@ import ExpenseCard from "./ExpenseCard.vue";
 const expenses = ref([]);
 
 onMounted(async () => {
-  const response = await useFetch("/api/expenses");
+  const response = await fetch("/api/expenses");
+  const json = await response.json();
 
-  expenses.value = response.data.value?.expenses;
+  expenses.value = json.expenses;
 });
 </script>
