@@ -1,3 +1,12 @@
+# Motivation to make this app
+
+1. Tricount started to suck due to it's slow load speed
+2. Splitwise UI, I don't like and they are now subscription based
+
+So let's just make a simpler one for my own needs.
+
+# How it's made
+
 This app is me testing and setting up the basics of Nuxt + Drizzle kit
 
 You can build using Sqlite + Nuxt + Drizzle ORM.
