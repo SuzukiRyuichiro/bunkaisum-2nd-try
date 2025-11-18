@@ -8,8 +8,7 @@
       "binding": "db",
       "database_name": "worker-test",
       "database_id": "50667758-7490-4374-b1c3-13338a3332d0",
-      "migrations_dir": "drizzle/migrations",
-      "remote": true
+      "migrations_dir": "drizzle"
     }
   ],
   "observability": {
