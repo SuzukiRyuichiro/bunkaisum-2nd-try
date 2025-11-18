@@ -1,0 +1,310 @@
+{
+  "name": "8bcd9346f8460aecf19d7daca6ec84892cdafcb12d9f3072f792f228e9f3ca5c.sqlite",
+  "tables": [
+    {
+      "name": "_cf_METADATA",
+      "type": "table",
+      "columns": [
+        {
+          "name": "key",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "value",
+          "type": "BLOB",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "key",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (key)",
+          "table": "_cf_METADATA",
+          "columns": [
+            "key"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE _cf_METADATA (\n        key INTEGER PRIMARY KEY,\n        value BLOB\n      )"
+    },
+    {
+      "name": "d1_migrations",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "applied_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_d1_migrations_1",
+          "def": "UNIQUE (name)",
+          "table": "d1_migrations",
+          "columns": [
+            "name"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "d1_migrations",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "sqlite_autoindex_d1_migrations_1",
+          "type": "UNIQUE",
+          "def": "UNIQUE (name)",
+          "table": "d1_migrations",
+          "columns": [
+            "name"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE d1_migrations(\n\t\tid         INTEGER PRIMARY KEY AUTOINCREMENT,\n\t\tname       TEXT UNIQUE,\n\t\tapplied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n)"
+    },
+    {
+      "name": "users",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "displayName",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "users",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE `users` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`displayName` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n)"
+    },
+    {
+      "name": "oAuthAccounts",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "provider",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "providerUserId",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "accessToken",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "refreshToken",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "expiresAt",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "oAuthAccounts",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "oAuthAccounts",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE \"oAuthAccounts\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`provider` text,\n\t`providerUserId` text,\n\t`accessToken` text,\n\t`refreshToken` text,\n\t`expiresAt` integer,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
+    },
+    {
+      "name": "expenses",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "totalAmount",
+          "type": "INTEGER",
+          "nullable": true,
+          "default": "0"
+        },
+        {
+          "name": "paidAt",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "emoji",
+          "type": "TEXT",
+          "nullable": true
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "expenses",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "expenses",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE \"expenses\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`title` text,\n\t`totalAmount` integer DEFAULT 0,\n\t`paidAt` text,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL, `emoji` text,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
+    }
+  ],
+  "relations": [
+    {
+      "table": "oAuthAccounts",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "expenses",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    }
+  ],
+  "driver": {
+    "name": "sqlite",
+    "database_version": "3.50.4"
+  }
+}

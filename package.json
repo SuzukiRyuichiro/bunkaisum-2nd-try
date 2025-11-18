@@ -12,7 +12,9 @@
     "drizzle:generate": "npx drizzle-kit generate:sqlite",
     "drizzle:migrate": "npx drizzle-kit migrate",
     "drizzle:studio": "npx drizzle-kit studio",
-    "drizzle:seed": "npx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- npx tsx ./drizzle/seed.ts"
+    "drizzle:seed": "npx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- npx tsx ./drizzle/seed.ts",
+    "liam:generate": "tbls out -t json -o liam/schema.json $(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit)",
+    "liam:view": "npx @liam-hq/cli erd build --format=tbls --input liam/schema.json && npx serve dist/"
   },
   "dependencies": {
     "@miniflare/d1": "^2.14.4",
