@@ -1,6 +1,5 @@
-import { useToast } from "@nuxt/ui/runtime/composables/useToast.js";
 import { expensesTable } from "~~/server/db/schema";
-import useDrizzle, { Expense } from "~~/server/utils/drizzle";
+import useDrizzle from "~~/server/utils/drizzle";
 
 export default defineEventHandler(async (event) => {
   // Here I wanna use Drizzle
@@ -14,5 +13,5 @@ export default defineEventHandler(async (event) => {
     .insert(expensesTable)
     .values({ userId: user.id, ...expense });
 
-  return { newExpense };
+  return newExpense;
 });

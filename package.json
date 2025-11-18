@@ -12,9 +12,11 @@
     "drizzle:generate": "npx drizzle-kit generate:sqlite",
     "drizzle:migrate": "npx drizzle-kit migrate",
     "drizzle:studio": "npx drizzle-kit studio",
-    "drizzle:seed": "tsx drizzle/seed.ts"
+    "drizzle:seed": "npx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- npx tsx ./drizzle/seed.ts"
   },
   "dependencies": {
+    "@miniflare/d1": "^2.14.4",
+    "@miniflare/shared": "^2.14.4",
     "@nuxt/icon": "^2.1.0",
     "@nuxt/ui": "^4.1.0",
     "better-sqlite3": "^12.4.1",
@@ -30,6 +32,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "drizzle-kit": "^0.31.7",
     "nitro-cloudflare-dev": "^0.2.2",
+    "tsx": "^4.20.6",
     "wrangler": "^4.47.0"
   }
 }

@@ -1,4 +1,4 @@
-import * as schema from "../db/schema";
+import * as schema from "~~/server/db/schema";
 import { H3Event } from "h3";
 import { drizzle } from "drizzle-orm/d1";
 
