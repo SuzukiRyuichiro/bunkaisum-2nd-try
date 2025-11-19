@@ -14,6 +14,7 @@ const db = drizzle(new D1Database(new D1DatabaseAPI(sqliteDb)), {
 
 console.log("cleaning...🧹");
 
+await db.delete(schema.involvementsTable);
 await db.delete(schema.expensesTable);
 await db.delete(schema.usersTable);
 
