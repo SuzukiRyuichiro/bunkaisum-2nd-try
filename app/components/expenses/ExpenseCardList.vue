@@ -7,6 +7,7 @@
       v-for="(expense, index) in expenses"
       :expense="expense"
       :key="index"
+      :to="{ name: 'expenses-id', params: { id: expense.id } }"
     />
   </div>
 </template>

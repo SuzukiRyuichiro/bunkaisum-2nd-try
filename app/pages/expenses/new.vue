@@ -1,19 +1,16 @@
 <template>
-  <div class="py-4">
+  <div>
     <Meta
       v-if="config.public.enableEmojiSuggestions"
       http-equiv="origin-trial"
       content="Ay9zgWOzVsfIJ97aKTvjzn6TAUKOKShK05ozaYMbNhuW67sq9wyY97qdI6Bqp28kmUjZrevZzrKIw/kP0h2aagYAAACOeyJvcmlnaW4iOiJodHRwczovL3J5dWljaGlyb3N1enVraS5jb206NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="
     />
-    <UButton @click="router.go(-1)" icon="i-lucide-arrow-left" variant="ghost"
-      >戻る</UButton
-    >
-    <div class="py-4">
+    <div class="py-2">
       <h1 class="text-lg font-semibold">新しい支払いを記録する</h1>
     </div>
     <UForm class="grid gap-4">
       <progress ref="progress" hidden="" id="progress" value="0"></progress>
-      <UCard>
+      <Card>
         <UFormField label="件名" name="title">
           <UInput
             class="w-full"
@@ -23,9 +20,9 @@
             placeholder="例: 目黒のランチ"
           />
         </UFormField>
-      </UCard>
+      </Card>
 
-      <UCard>
+      <Card>
         <p v-if="config.public.enableEmojiSuggestions">
           ChromeでやるとAIが勝手に選んでくれるはず
         </p>
@@ -40,8 +37,8 @@
           v-model="formState.emoji"
           :items="items"
         />
-      </UCard>
-      <UCard>
+      </Card>
+      <Card>
         <UFormField label="合計額" name="total amount">
           <UInputNumber
             class="w-full"
@@ -55,9 +52,9 @@
             }"
           />
         </UFormField>
-      </UCard>
+      </Card>
 
-      <UCard>
+      <Card>
         <UFormField label="支払った人" name="paid by">
           <USelect
             placeholder="一人選んでください"
@@ -68,8 +65,8 @@
             :items="users.map((u) => ({ id: u.id, label: u.displayName }))"
           />
         </UFormField>
-      </UCard>
-      <UCard>
+      </Card>
+      <Card>
         <UCheckboxGroup
           legend="割り勘"
           v-model="formState.participants"
@@ -86,13 +83,17 @@
             </div>
           </template>
         </UCheckboxGroup>
-      </UCard>
+      </Card>
     </UForm>
   </div>
 </template>
 
 <script setup lang="ts">
-const router = useRouter();
+import Card from "~/components/misc/Card.vue";
+
+definePageMeta({
+  layout: "back",
+});
 const config = useRuntimeConfig();
 
 const { data: users } = await useFetch("/api/users");
