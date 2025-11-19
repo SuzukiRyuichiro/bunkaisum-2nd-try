@@ -74,3 +74,16 @@ export const oAuthAccountsRelations = relations(
     }),
   })
 );
+export const involvementsRelations = relations(
+  involvementsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [involvementsTable.userId],
+      references: [usersTable.id],
+    }),
+    expense: one(expensesTable, {
+      fields: [involvementsTable.expenseId],
+      references: [expensesTable.id],
+    }),
+  })
+);

@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { D1Database, D1DatabaseAPI } from "@miniflare/d1";
 import { createSQLiteDB } from "@miniflare/shared";
 import * as schema from "../server/db/schema";
+import { fairSplit } from "../app/utils/fairSplit";
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not defined");
 
@@ -20,7 +21,7 @@ console.log("done cleaning ✅");
 console.log("Seeding users and expenses 🌱");
 
 // Create users
-const [scooter, kaede, kouga, nanako, kyochan] = await db
+const users = await db
   .insert(schema.usersTable)
   .values([
     { displayName: "Scooter" },
@@ -30,6 +31,8 @@ const [scooter, kaede, kouga, nanako, kyochan] = await db
     { displayName: "きょうちゃん" },
   ])
   .returning();
+
+const [scooter, kaede, kouga, nanako, kyochan] = users;
 
 // Helper function to get a date N days ago
 const daysAgo = (days: number): string => {
@@ -182,6 +185,35 @@ const expenses = [
   },
 ];
 
-await db.insert(schema.expensesTable).values(expenses);
+const insertedExpenses = await db
+  .insert(schema.expensesTable)
+  .values(expenses)
+  .returning();
+
+insertedExpenses.forEach(async (expense) => {
+  const randomUserIndex = Math.floor(Math.random() * users.length);
+  const creditor = users[randomUserIndex];
+  const debtors = users.toSpliced(randomUserIndex);
+  const splits = fairSplit(expense.totalAmount || 0, users.length);
+
+  const values = [
+    ...splits.map((split, index) => {
+      return {
+        userId: users[index].id,
+        expenseId: expense.id,
+        amount: -split,
+        type: "share",
+      };
+    }),
+    {
+      userId: creditor.id,
+      expenseId: expense.id,
+      amount: expense.totalAmount,
+      type: "payment",
+    },
+  ];
+
+  await db.insert(schema.involvementsTable).values(values);
+});
 
 console.log("Seeding complete! ✅");
