@@ -19,6 +19,7 @@ export const expensesTable = sqliteTable("expenses", {
   emoji: text(),
   paidAt: text("paidAt"), // Store as "YYYY-MM-DD" string
   userId: int("userId").references(() => usersTable.id),
+  splitType: text("splitType").default("equal"),
   ...timestamps,
 });
 
@@ -39,17 +40,29 @@ export const oAuthAccountsTable = sqliteTable("oAuthAccounts", {
   ...timestamps,
 });
 
+export const involvementsTable = sqliteTable("involvements", {
+  id: int().primaryKey({ autoIncrement: true }),
+  userId: int("userId").references(() => usersTable.id),
+  expenseId: int("expenseId").references(() => expensesTable.id),
+  amount: int("amount").notNull(),
+  type: text("type").notNull(),
+  shareRatio: int("shareRatio"),
+  ...timestamps,
+});
+
 // Relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
   expenses: many(expensesTable),
   oAuthAccounts: many(oAuthAccountsTable),
+  involvements: many(involvementsTable),
 }));
 
-export const expensesRelations = relations(expensesTable, ({ one }) => ({
+export const expensesRelations = relations(expensesTable, ({ one, many }) => ({
   user: one(usersTable, {
     fields: [expensesTable.userId],
     references: [usersTable.id],
   }),
+  involvements: many(involvementsTable),
 }));
 
 export const oAuthAccountsRelations = relations(

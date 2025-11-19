@@ -246,6 +246,12 @@
           "name": "emoji",
           "type": "TEXT",
           "nullable": true
+        },
+        {
+          "name": "splitType",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "'equal'"
         }
       ],
       "constraints": [
@@ -272,7 +278,145 @@
           ]
         }
       ],
-      "def": "CREATE TABLE \"expenses\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`title` text,\n\t`totalAmount` integer DEFAULT 0,\n\t`paidAt` text,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL, `emoji` text,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
+      "def": "CREATE TABLE \"expenses\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`title` text,\n\t`totalAmount` integer DEFAULT 0,\n\t`paidAt` text,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL, `emoji` text, `splitType` text DEFAULT 'equal',\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
+    },
+    {
+      "name": "__drizzle_migrations",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL",
+          "nullable": true
+        },
+        {
+          "name": "hash",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "numeric",
+          "nullable": true
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex___drizzle_migrations_1",
+          "def": "PRIMARY KEY (id)",
+          "table": "__drizzle_migrations",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "__drizzle_migrations",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "sqlite_autoindex___drizzle_migrations_1",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "__drizzle_migrations",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE \"__drizzle_migrations\" (\n\t\t\t\tid SERIAL PRIMARY KEY,\n\t\t\t\thash text NOT NULL,\n\t\t\t\tcreated_at numeric\n\t\t\t)"
+    },
+    {
+      "name": "involvements",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "expenseId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "amount",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "shareRatio",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "involvements",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (expenseId) REFERENCES expenses (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "involvements",
+          "referenced_table": "expenses",
+          "columns": [
+            "expenseId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 1)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "involvements",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE `involvements` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`userId` integer,\n\t`expenseId` integer,\n\t`amount` integer NOT NULL,\n\t`type` text NOT NULL,\n\t`shareRatio` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`expenseId`) REFERENCES `expenses`(`id`) ON UPDATE no action ON DELETE no action\n)"
     }
   ],
   "relations": [
@@ -291,6 +435,32 @@
     },
     {
       "table": "expenses",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "involvements",
+      "columns": [
+        "expenseId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "expenses",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (expenseId) REFERENCES expenses (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "involvements",
       "columns": [
         "userId"
       ],

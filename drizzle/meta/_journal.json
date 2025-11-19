@@ -64,6 +64,13 @@
       "when": 1763349023511,
       "tag": "0008_safe_titania",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1763531686295,
+      "tag": "0009_slippery_speed",
+      "breakpoints": true
     }
   ]
 }
