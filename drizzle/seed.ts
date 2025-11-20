@@ -4,6 +4,7 @@ import { D1Database, D1DatabaseAPI } from "@miniflare/d1";
 import { createSQLiteDB } from "@miniflare/shared";
 import * as schema from "../server/db/schema";
 import { fairSplit } from "../app/utils/fairSplit";
+import { ratioSplit } from "../app/utils/ratioSplit";
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not defined");
 
@@ -142,48 +143,6 @@ const expenses = [
     paidAt: daysAgo(14),
     userId: kouga.id,
   },
-  {
-    title: "キッチンスポンジ",
-    emoji: "🧽",
-    totalAmount: 280,
-    paidAt: daysAgo(11),
-    userId: kyochan.id,
-  },
-  {
-    title: "寿司",
-    emoji: "🍣",
-    totalAmount: 9200,
-    paidAt: daysAgo(9),
-    userId: scooter.id,
-  },
-  {
-    title: "ティッシュペーパー",
-    emoji: "📦",
-    totalAmount: 880,
-    paidAt: daysAgo(7),
-    userId: kaede.id,
-  },
-  {
-    title: "温泉",
-    emoji: "♨️",
-    totalAmount: 5000,
-    paidAt: daysAgo(5),
-    userId: nanako.id,
-  },
-  {
-    title: "コンビニお菓子",
-    emoji: "🍫",
-    totalAmount: 1200,
-    paidAt: daysAgo(3),
-    userId: kouga.id,
-  },
-  {
-    title: "タピオカ",
-    emoji: "🧋",
-    totalAmount: 2100,
-    paidAt: daysAgo(1),
-    userId: kyochan.id,
-  },
 ];
 
 const insertedExpenses = await db
@@ -217,4 +176,89 @@ insertedExpenses.forEach(async (expense) => {
   await db.insert(schema.involvementsTable).values(values);
 });
 
+const ratioExpenses = [
+  {
+    title: "キッチンスポンジ",
+    emoji: "🧽",
+    totalAmount: 280,
+    paidAt: daysAgo(11),
+    userId: kyochan.id,
+    splitType: "ratio",
+  },
+  {
+    title: "寿司",
+    emoji: "🍣",
+    totalAmount: 9200,
+    paidAt: daysAgo(9),
+    userId: scooter.id,
+    splitType: "ratio",
+  },
+  {
+    title: "ティッシュペーパー",
+    emoji: "📦",
+    totalAmount: 880,
+    paidAt: daysAgo(7),
+    userId: kaede.id,
+    splitType: "ratio",
+  },
+  {
+    title: "温泉",
+    emoji: "♨️",
+    totalAmount: 5000,
+    paidAt: daysAgo(5),
+    userId: nanako.id,
+    splitType: "ratio",
+  },
+  {
+    title: "コンビニお菓子",
+    emoji: "🍫",
+    totalAmount: 1200,
+    paidAt: daysAgo(3),
+    userId: kouga.id,
+    splitType: "ratio",
+  },
+  {
+    title: "タピオカ",
+    emoji: "🧋",
+    totalAmount: 2100,
+    paidAt: daysAgo(1),
+    userId: kyochan.id,
+    splitType: "ratio",
+  },
+];
+
+const insertedRatioExpenses = await db
+  .insert(schema.expensesTable)
+  .values(ratioExpenses)
+  .returning();
+
+insertedRatioExpenses.forEach(async (expense) => {
+  const randomUserIndex = Math.floor(Math.random() * users.length);
+  const creditor = users[randomUserIndex];
+  const debtors = users.toSpliced(randomUserIndex);
+  const ratio = Array.from({ length: users.length }, () =>
+    Math.ceil(Math.random() * 4)
+  );
+  const splits = ratioSplit(expense.totalAmount || 0, ratio);
+
+  const values = [
+    ...splits.map((split, index) => {
+      return {
+        userId: users[index].id,
+        expenseId: expense.id,
+        amount: -split,
+        type: "share",
+        shareRatio: ratio[index],
+      };
+    }),
+    {
+      userId: creditor.id,
+      expenseId: expense.id,
+      amount: expense.totalAmount,
+      type: "payment",
+    },
+  ];
+
+  await db.insert(schema.involvementsTable).values(values);
+});
 console.log("Seeding complete! ✅");

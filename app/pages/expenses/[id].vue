@@ -26,7 +26,7 @@
             <p class="text-xs">が全額払いました</p>
           </div>
         </div>
-        <p class="text-red-600 text-xl">
+        <p class="text-red-600 text-xl font-bold">
           ¥{{
             expense?.involvements.find(
               (involvement) => involvement.type == "payment"
@@ -40,12 +40,12 @@
         <div class="flex gap-2 mt-4">
           <p>詳細</p>
           <UBadge variant="soft" size="xs" v-if="expense?.splitType === 'equal'"
-            >🟰 均等に割り勘</UBadge
-          >
+            >🟰 均等に割り勘
+          </UBadge>
           <UBadge
             variant="soft"
             size="xs"
-            v-else-if="expense?.splitType === 'exact'"
+            v-else-if="expense?.splitType === 'ratio'"
             >➗ 比率で割り勘</UBadge
           >
           <UBadge variant="soft" size="xs" v-else>🧮 マニュアルの金額</UBadge>
@@ -61,7 +61,11 @@
           <UAvatar src="https://github.com/benjamincanac.png" size="xl" />
           <p class="grow font-lg font-medium">
             {{ involvement.user?.displayName }}
+            <span class="text-muted text-xs" v-if="involvement.shareRatio"
+              >{{ involvement.shareRatio }}x</span
+            >
           </p>
+
           <span class="font-semibold">¥{{ -involvement.amount }}</span>
         </div>
       </div>

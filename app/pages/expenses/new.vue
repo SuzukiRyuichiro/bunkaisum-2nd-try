@@ -15,6 +15,7 @@
           <UInput
             class="w-full"
             size="lg"
+            variant="soft"
             v-model="formState.title"
             @change="suggestEmoji"
             placeholder="例: 目黒のランチ"
@@ -31,7 +32,10 @@
           legend="絵文字を選んでね"
           variant="card"
           size="md"
-          :ui="{ item: 'text-3xl', fieldset: 'flex-wrap' }"
+          :ui="{
+            item: 'text-3xl bg-elevated/50 has-data-[state=checked]:bg-primary/10 has-data-[state=checked]:border-primary/10',
+            fieldset: 'flex-wrap',
+          }"
           default-value="System"
           orientation="horizontal"
           v-model="formState.emoji"
@@ -42,6 +46,7 @@
         <UFormField label="合計額" name="total amount">
           <UInputNumber
             class="w-full"
+            variant="soft"
             :min="0"
             size="lg"
             v-model="formState.totalAmount"
@@ -59,6 +64,7 @@
           <USelect
             placeholder="一人選んでください"
             size="lg"
+            variant="soft"
             class="w-full"
             v-model="formState.userId"
             value-key="id"
@@ -74,10 +80,11 @@
           value-key="id"
           :ui="{
             item: 'items-center',
+            fieldset: 'gap-3',
           }"
         >
           <template #label="{ item }">
-            <div class="flex gap-4 items-center">
+            <div class="flex gap-3 items-center">
               <UAvatar src="https://github.com/benjamincanac.png" />
               <p>{{ item?.displayName }}</p>
             </div>
