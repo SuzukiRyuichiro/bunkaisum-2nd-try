@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pb-10">
     <Meta
       v-if="config.public.enableEmojiSuggestions"
       http-equiv="origin-trial"
@@ -74,8 +74,8 @@
       </Card>
       <Card>
         <UCheckboxGroup
-          legend="割り勘"
-          v-model="formState.participants"
+          legend="参加者"
+          v-model="formState.participantIds"
           :items="users"
           value-key="id"
           :ui="{
@@ -91,12 +91,46 @@
           </template>
         </UCheckboxGroup>
       </Card>
+      <Card>
+        <UFormField label="割り勘の方法">
+          <UTabs
+            v-model="formState.splitType"
+            :items="splitOptions"
+            class="w-full mt-2"
+          >
+            <template #equal>
+              <h3>人数で均等に割り勘</h3>
+              <USeparator class="my-3" />
+              <div class="grid gap-2">
+                <div v-for="share in split" class="flex w-full justify-between">
+                  <span>{{ share.displayName }}</span>
+                  <span>¥{{ share.amount || 0 }}</span>
+                </div>
+              </div>
+              <div
+                class="flex justify-between"
+                v-for="participant in formState.participantIds"
+              >
+                <span></span>
+                <span></span>
+              </div>
+            </template>
+            <template #ratio>
+              <h1>ratio</h1>
+            </template>
+            <template #manual>
+              <h1>manual</h1>
+            </template>
+          </UTabs>
+        </UFormField>
+      </Card>
     </UForm>
   </div>
 </template>
 
 <script setup lang="ts">
 import Card from "~/components/misc/Card.vue";
+import type { TabsItem } from "@nuxt/ui";
 
 definePageMeta({
   layout: "back",
@@ -110,10 +144,46 @@ const formState = ref({
   emoji: "",
   title: "",
   userId: null,
-  participants: users.value?.map((u) => u.id),
+  participantIds: users.value?.map((u) => u.id),
+  splitType: "equal",
 });
 
 const items = ["🍕", "☕️", "🧻", "✈️", "🛒", "🎉", "💸"];
+
+const splitOptions = ref<TabsItem[]>([
+  {
+    label: "均等",
+    icon: "i-lucide-scale",
+    slot: "equal",
+    value: "equal",
+  },
+  {
+    label: "比率",
+    icon: "i-lucide-divide",
+    slot: "ratio",
+    value: "ratio",
+  },
+  {
+    label: "マニュアル",
+    icon: "i-lucide-calculator",
+    slot: "manual",
+    value: "manual",
+  },
+]);
+
+const split = computed<{ displayName: string; amount: number }[]>(() => {
+  if (formState.value.splitType === "equal") {
+    const shares = fairSplit(
+      formState.value.totalAmount,
+      formState.value.participantIds?.length || 0
+    );
+
+    return formState.value.participantIds?.map((participantId, index) => {
+      const user = users.value?.find((user) => user.id === participantId);
+      return { displayName: user?.displayName, amount: shares[index] };
+    });
+  }
+});
 
 // Will not use for now
 let sessionCreationTriggered = false;

@@ -5,7 +5,7 @@ export const fairSplit = (total: number, count: number) => {
 
   const base = Math.floor(total / count);
   const split = Array(count).fill(base);
-  const remainder = total % base;
+  const remainder = base === 0 ? total : total % base;
 
   for (let i = 0; i < remainder; i += 1) {
     split[i] += 1;
