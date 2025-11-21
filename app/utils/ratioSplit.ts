@@ -1,25 +1,23 @@
 const sum = (numbers: number[]): number => {
   return numbers.reduce(
-    (accumulator, currentValue) => accumulator + currentValue
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
   );
 };
 
-export const ratioSplit = (total: number, ratio: number[]) => {
-  if (ratio.length === 0 || total <= 0) {
-    return [];
-  }
+// Ratio goes in as map of key being the user id and value being the ratio value
+// In return, we get map of key being the user id and value being the amount in the right ratio
+export const ratioSplit = (total: number, ratio: Map<number, number>) => {
+  const participantIds = Array.from(ratio.keys());
 
-  const base = total / sum(ratio);
+  const count = sum(Array.from(ratio.values()));
 
-  const split = ratio.map((element) => Math.floor(element * base));
+  const base = Math.floor(total / count);
+  const split = new Map(participantIds.map((id) => [id, base * ratio.get(id)]));
+  const remainder = total - base * count;
 
-  const difference = total - sum(split);
-
-  for (let i = 0; i < split.length && i < difference; i += 1) {
-    const curr = split[i];
-    if (curr == undefined) continue;
-
-    split[i] = curr + 1;
+  for (let i = 0; i < remainder; i += 1) {
+    split.set(participantIds[i]!, split.get(participantIds[i]!)! + 1);
   }
 
   return split;

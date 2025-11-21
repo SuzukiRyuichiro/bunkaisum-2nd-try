@@ -24,9 +24,6 @@
       </Card>
 
       <Card>
-        <p v-if="config.public.enableEmojiSuggestions">
-          ChromeでやるとAIが勝手に選んでくれるはず
-        </p>
         <URadioGroup
           indicator="hidden"
           legend="絵文字を選んでね"
@@ -48,6 +45,7 @@
             class="w-full"
             variant="soft"
             :min="0"
+            orientation="vertical"
             size="lg"
             v-model="formState.totalAmount"
             :format-options="{
@@ -72,6 +70,31 @@
           />
         </UFormField>
       </Card>
+
+      <Card>
+        <UFormField label="支払った日" name="paid at">
+          <UPopover>
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-lucide-calendar"
+              class="w-full"
+            >
+              {{
+                formState.paidAt
+                  ? dateFormatter.format(
+                      formState.paidAt.toDate(getLocalTimeZone())
+                    )
+                  : "Select a date"
+              }}
+            </UButton>
+
+            <template #content>
+              <UCalendar v-model="formState.paidAt" class="p-2" />
+            </template>
+          </UPopover>
+        </UFormField>
+      </Card>
       <Card>
         <UCheckboxGroup
           legend="参加者"
@@ -91,6 +114,8 @@
           </template>
         </UCheckboxGroup>
       </Card>
+
+      <p class="text-[0.5rem]">{{ shareInvolvements }}</p>
       <Card>
         <UFormField label="割り勘の方法">
           <UTabs
@@ -102,21 +127,33 @@
               <h3>人数で均等に割り勘</h3>
               <USeparator class="my-3" />
               <div class="grid gap-2">
-                <div v-for="share in split" class="flex w-full justify-between">
-                  <span>{{ share.displayName }}</span>
-                  <span>¥{{ share.amount || 0 }}</span>
+                <div
+                  v-for="involvement in shareInvolvements"
+                  class="flex w-full justify-between"
+                >
+                  <span>{{ involvement.user?.displayName }}</span>
+                  <span>¥{{ -involvement.amount || 0 }}</span>
                 </div>
-              </div>
-              <div
-                class="flex justify-between"
-                v-for="participant in formState.participantIds"
-              >
-                <span></span>
-                <span></span>
               </div>
             </template>
             <template #ratio>
-              <h1>ratio</h1>
+              <h3>比率で割り勘</h3>
+              <USeparator class="my-3" />
+              <div class="grid gap-2">
+                <div
+                  v-for="involvement in shareInvolvements"
+                  class="flex w-full justify-between"
+                >
+                  <span>{{ involvement.user?.displayName }}</span>
+                  <UInputNumber
+                    :value="splitRatio.get(involvement.userId)"
+                    @update:modelValue="
+                      (v) => splitRatio.set(involvement.userId, v)
+                    "
+                  />
+                  <span>¥{{ -involvement.amount || 0 }}</span>
+                </div>
+              </div>
             </template>
             <template #manual>
               <h1>manual</h1>
@@ -130,7 +167,13 @@
 
 <script setup lang="ts">
 import Card from "~/components/misc/Card.vue";
-import type { TabsItem } from "@nuxt/ui";
+import {
+  CalendarDate,
+  DateFormatter,
+  getLocalTimeZone,
+  today,
+  type DateValue,
+} from "@internationalized/date";
 
 definePageMeta({
   layout: "back",
@@ -146,11 +189,68 @@ const formState = ref({
   userId: null,
   participantIds: users.value?.map((u) => u.id),
   splitType: "equal",
+  paidAt: today(getLocalTimeZone()),
 });
+
+const dateFormatter = new DateFormatter("ja-JP", {
+  dateStyle: "medium",
+});
+
+const splitRatio = ref(
+  new Map(formState.value?.participantIds?.map((id) => [id, 1]))
+);
+
+const involvements = computed(() => {
+  if (formState.value.splitType === "equal") {
+    const split = fairSplit(
+      formState.value.totalAmount,
+      formState.value.participantIds || []
+    );
+
+    return [
+      ...(formState.value.participantIds?.map((id) => ({
+        userId: id,
+        user: users.value?.find((user) => user.id === id),
+        type: "share",
+        amount: -(split?.get(id) || 0),
+      })) || []),
+      {
+        userId: formState.value.userId,
+        user: users.value?.find((user) => user.id === formState.value.userId),
+        type: "payment",
+        amount: formState.value.totalAmount,
+      },
+    ];
+  } else if (formState.value.splitType === "ratio") {
+    const split = ratioSplit(formState.value.totalAmount, splitRatio.value);
+    console.log({ split });
+    return [
+      ...(formState.value.participantIds?.map((id) => ({
+        userId: id,
+        user: users.value?.find((user) => user.id === id),
+        type: "share",
+        amount: -(split?.get(id) || 0),
+        shareRatio: splitRatio.value.get(id),
+      })) || []),
+      {
+        userId: formState.value.userId,
+        user: users.value?.find((user) => user.id === formState.value.userId),
+        type: "payment",
+        amount: formState.value.totalAmount,
+      },
+    ];
+  }
+
+  return [];
+});
+
+const shareInvolvements = computed(() =>
+  involvements.value.filter((involvement) => involvement.type === "share")
+);
 
 const items = ["🍕", "☕️", "🧻", "✈️", "🛒", "🎉", "💸"];
 
-const splitOptions = ref<TabsItem[]>([
+const splitOptions = [
   {
     label: "均等",
     icon: "i-lucide-scale",
@@ -169,117 +269,19 @@ const splitOptions = ref<TabsItem[]>([
     slot: "manual",
     value: "manual",
   },
-]);
-
-const split = computed<{ displayName: string; amount: number }[]>(() => {
-  if (formState.value.splitType === "equal") {
-    const shares = fairSplit(
-      formState.value.totalAmount,
-      formState.value.participantIds?.length || 0
-    );
-
-    return formState.value.participantIds?.map((participantId, index) => {
-      const user = users.value?.find((user) => user.id === participantId);
-      return { displayName: user?.displayName, amount: shares[index] };
-    });
-  }
-});
-
-// Will not use for now
-let sessionCreationTriggered = false;
-let localSession = null;
-const createSession = async (options = {}) => {
-  if (sessionCreationTriggered) {
-    return;
-  }
-
-  // Only run on client-side, not during SSR
-  if (typeof window === "undefined" || !window.LanguageModel) {
-    console.log("LanguageModel API not available");
-    return null;
-  }
-
-  try {
-    const availability = await window.LanguageModel.availability();
-    if (availability === "unavailable") {
-      throw new Error("LanguageModel is not available.");
-    }
-
-    let modelNewlyDownloaded = false;
-    if (availability !== "available") {
-      modelNewlyDownloaded = true;
-    }
-    console.log(`LanguageModel is ${availability}.`);
-    sessionCreationTriggered = true;
-
-    const llmSession = await window.LanguageModel.create({
-      monitor(m) {
-        m.addEventListener("downloadprogress", (e) => {
-          console.log(`Downloaded ${e.loaded * 100}%`);
-        });
-      },
-    });
-
-    sessionCreationTriggered = false;
-    return llmSession;
-  } catch (error) {
-    throw error;
-  }
-};
+];
 
 const suggestEmoji = async () => {
-  if (!config.public.enableEmojiSuggestions) {
-    // feature flag
-    console.log(
-      "Please turn on the feature flag if you wish AI to suggest emoji"
-    );
-    return;
-  }
+  // If emoji is already chosen, don't change
+  if (formState.value.emoji !== "") return;
 
-  // Only run on client-side
-  if (typeof window === "undefined" || !window.LanguageModel) {
-    console.log("LanguageModel API not available - skipping emoji suggestion");
-    return;
-  }
+  const emoji = await $fetch("/api/emojis/suggest", {
+    method: "POST",
+    body: { title: formState.value.title },
+  });
 
-  try {
-    localSession = await createSession({
-      expectedInputs: [{ type: "text", languages: ["ja"] }, { type: "text" }],
-      expectedOutputs: [{ type: "text", languages: ["ja"] }],
-      initialPrompts: [
-        {
-          role: "system",
-          content:
-            "あなたは文章を特定の絵文字にカテゴライズすることに特化したアシスタントです。様々な支出を割り勘するためのアプリの補助をしています。",
-        },
-      ],
-    });
-  } catch (error) {
-    alert(error);
-    return;
-  }
-
-  if (!localSession) {
-    console.log("Failed to create LLM session");
-    return;
-  }
-
-  try {
-    const prompt = `もしこの中の絵文字から"${
-      formState.value.title
-    }"という文章を総括する様な絵文字を選ぶとしたら、どれを選ぶ？ 絵文字はこれら ${items.join(
-      ", "
-    )}。インデックスで答えてほしい ${items
-      .map((item, index) => `${item} => ${index}`)
-      .join(", ")}`;
-
-    const result = await localSession.prompt(prompt, {
-      responseConstraint: { type: "integer" },
-    });
-
-    formState.value.emoji = items[parseInt(result)];
-  } catch (err) {
-    console.error(err);
+  if (emoji) {
+    formState.value.emoji = emoji;
   }
 };
 </script>
