@@ -51,7 +51,7 @@
             :format-options="{
               style: 'currency',
               currency: 'JPY',
-              currencyDisplay: 'code',
+              currencyDisplay: 'symbol',
             }"
           />
         </UFormField>
@@ -99,6 +99,7 @@
         <UCheckboxGroup
           legend="参加者"
           v-model="formState.participantIds"
+          @update:model-value="recalculateSplitRatio"
           :items="users"
           value-key="id"
           :ui="{
@@ -115,7 +116,6 @@
         </UCheckboxGroup>
       </Card>
 
-      <p class="text-[0.5rem]">{{ shareInvolvements }}</p>
       <Card>
         <UFormField label="割り勘の方法">
           <UTabs
@@ -126,10 +126,10 @@
             <template #equal>
               <h3>人数で均等に割り勘</h3>
               <USeparator class="my-3" />
-              <div class="grid gap-2">
+              <div class="grid gap-3">
                 <div
                   v-for="involvement in shareInvolvements"
-                  class="flex w-full justify-between"
+                  class="flex w-full justify-between items-center"
                 >
                   <span>{{ involvement.user?.displayName }}</span>
                   <span>¥{{ -involvement.amount || 0 }}</span>
@@ -139,28 +139,75 @@
             <template #ratio>
               <h3>比率で割り勘</h3>
               <USeparator class="my-3" />
-              <div class="grid gap-2">
+              <div class="grid gap-3">
                 <div
                   v-for="involvement in shareInvolvements"
-                  class="flex w-full justify-between"
+                  class="flex w-full justify-between items-center"
                 >
                   <span>{{ involvement.user?.displayName }}</span>
-                  <UInputNumber
-                    :value="splitRatio.get(involvement.userId)"
-                    @update:modelValue="
-                      (v) => splitRatio.set(involvement.userId, v)
-                    "
-                  />
-                  <span>¥{{ -involvement.amount || 0 }}</span>
+                  <div class="flex gap-4 items-center">
+                    <UInputNumber
+                      :value="splitRatio.get(involvement.userId)"
+                      @update:modelValue="
+                        (v) => splitRatio.set(involvement.userId, v)
+                      "
+                      :min="1"
+                      :max="20"
+                      orientation="vertical"
+                      size="xs"
+                      class="w-16"
+                    />
+                    <span>¥{{ -involvement.amount || 0 }}</span>
+                  </div>
                 </div>
               </div>
             </template>
             <template #manual>
-              <h1>manual</h1>
+              <h3>カスタムの割り勘</h3>
+              <USeparator class="my-3" />
+              <div class="grid gap-3">
+                <div
+                  v-for="involvement in shareInvolvements"
+                  class="flex w-full justify-between items-center"
+                >
+                  <span>{{ involvement.user?.displayName }}</span>
+                  <UInputNumber
+                    size="xs"
+                    orientation="vertical"
+                    :min="0"
+                    :value="manualSplit.get(involvement.userId)"
+                    @update:modelValue="
+                      (v) => manualSplit.set(involvement.userId, v)
+                    "
+                    :format-options="{
+                      style: 'currency',
+                      currency: 'JPY',
+                      currencyDisplay: 'symbol',
+                    }"
+                  />
+                </div>
+              </div>
+              <div
+                v-if="
+                  formState.totalAmount !==
+                  [...manualSplit.values()].reduce((acc, v) => acc + v, 0)
+                "
+              >
+                <USeparator class="my-3" />
+                <p class="text-error-500">合計額が合いません</p>
+              </div>
             </template>
           </UTabs>
         </UFormField>
       </Card>
+
+      <UButton
+        size="xl"
+        color="success"
+        :leading="false"
+        :ui="{ base: 'justify-center' }"
+        >💾 追加</UButton
+      >
     </UForm>
   </div>
 </template>
@@ -200,6 +247,19 @@ const splitRatio = ref(
   new Map(formState.value?.participantIds?.map((id) => [id, 1]))
 );
 
+const manualSplit = ref(
+  new Map(formState.value?.participantIds?.map((id) => [id, 0]))
+);
+
+const recalculateSplitRatio = () => {
+  splitRatio.value = new Map(
+    formState.value?.participantIds?.map((id) => [
+      id,
+      splitRatio.value?.get(id) || 1,
+    ])
+  );
+};
+
 const involvements = computed(() => {
   if (formState.value.splitType === "equal") {
     const split = fairSplit(
@@ -223,7 +283,6 @@ const involvements = computed(() => {
     ];
   } else if (formState.value.splitType === "ratio") {
     const split = ratioSplit(formState.value.totalAmount, splitRatio.value);
-    console.log({ split });
     return [
       ...(formState.value.participantIds?.map((id) => ({
         userId: id,
@@ -231,6 +290,22 @@ const involvements = computed(() => {
         type: "share",
         amount: -(split?.get(id) || 0),
         shareRatio: splitRatio.value.get(id),
+      })) || []),
+      {
+        userId: formState.value.userId,
+        user: users.value?.find((user) => user.id === formState.value.userId),
+        type: "payment",
+        amount: formState.value.totalAmount,
+      },
+    ];
+  } else if (formState.value.splitType === "manual") {
+    const split = manualSplit.value;
+    return [
+      ...(formState.value.participantIds?.map((id) => ({
+        userId: id,
+        user: users.value?.find((user) => user.id === id),
+        type: "share",
+        amount: -(split?.get(id) || 0),
       })) || []),
       {
         userId: formState.value.userId,
@@ -248,7 +323,7 @@ const shareInvolvements = computed(() =>
   involvements.value.filter((involvement) => involvement.type === "share")
 );
 
-const items = ["🍕", "☕️", "🧻", "✈️", "🛒", "🎉", "💸"];
+const items = ["🍕", "☕️", "🍺", "🧻", "✈️", "🛒", "🎉", "💸"];
 
 const splitOptions = [
   {

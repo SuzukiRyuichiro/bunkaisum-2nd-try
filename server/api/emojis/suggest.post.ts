@@ -12,7 +12,7 @@ async function getEmojiSuggestionFromGroq(title: string) {
       {
         role: "user",
         content:
-          "Given the following title (usually given in Japanese) of an expense recorded, determine the most suitable emojis out of pizza, coffee, toilet paper, airplane, shopping cart, party, and money flying away",
+          "Given the following title (usually given in Japanese) of an expense recorded, determine the most suitable emojis out of pizza, coffee, toilet paper, beer, airplane, shopping cart, party, and money flying away",
       },
       {
         role: "user",
@@ -29,7 +29,7 @@ async function getEmojiSuggestionFromGroq(title: string) {
           properties: {
             category: {
               type: "string",
-              enum: ["🍕", "☕️", "🧻", "✈️", "🛒", "🎉", "💸"],
+              enum: ["🍕", "☕️", "🍺", "🧻", "✈️", "🛒", "🎉", "💸"],
             },
           },
         },
