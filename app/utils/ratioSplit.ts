@@ -16,8 +16,12 @@ export const ratioSplit = (total: number, ratio: Map<number, number>) => {
   const split = new Map(participantIds.map((id) => [id, base * ratio.get(id)]));
   const remainder = total - base * count;
 
+  const participantCount = participantIds.length;
   for (let i = 0; i < remainder; i += 1) {
-    split.set(participantIds[i]!, split.get(participantIds[i]!)! + 1);
+    split.set(
+      participantIds[i % participantCount]!,
+      split.get(participantIds[i % participantCount]!)! + 1
+    );
   }
 
   return split;
