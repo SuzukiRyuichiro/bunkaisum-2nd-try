@@ -5,7 +5,7 @@
       icon="i-lucide-plus"
       size="lg"
       to="/expenses/new"
-      >Add an expense</UButton
+      >支払いを記録</UButton
     >
     <ExpenseCardList />
   </div>

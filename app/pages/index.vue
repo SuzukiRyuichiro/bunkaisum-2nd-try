@@ -24,13 +24,13 @@
 <script setup lang="ts">
 const items = [
   {
-    label: "Expenses",
-    icon: "i-lucide-user",
+    label: "出納表",
+    icon: "i-lucide-receipt-japanese-yen",
     slot: "expenses",
   },
   {
-    label: "Balance",
-    icon: "i-lucide-lock",
+    label: "貸借対照表",
+    icon: "i-lucide-hand-coins",
     slot: "balance",
   },
 ];
