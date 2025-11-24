@@ -150,18 +150,36 @@ const insertedExpenses = await db
   .values(expenses)
   .returning();
 
-insertedExpenses.forEach(async (expense) => {
-  const randomUserIndex = Math.floor(Math.random() * users.length);
-  const creditor = users[randomUserIndex];
-  const debtors = users.toSpliced(randomUserIndex);
-  const splits = fairSplit(expense.totalAmount || 0, users.length);
+// Helper to get random subset of users
+const getRandomParticipants = (
+  allUsers: typeof users,
+  minCount: number = 2
+) => {
+  // 60% chance of everyone, 40% chance of subset
+  if (Math.random() < 0.6) {
+    return allUsers;
+  }
+
+  // Random subset: 2 to (users.length - 1) people
+  const count = Math.floor(Math.random() * (allUsers.length - minCount + 1)) + minCount;
+  const shuffled = [...allUsers].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+};
+
+insertedExpenses.forEach(async (expense, index) => {
+  // First few expenses have everyone, then mix it up
+  const participants = index < 3 ? users : getRandomParticipants(users);
+  const randomParticipantIndex = Math.floor(Math.random() * participants.length);
+  const creditor = participants[randomParticipantIndex];
+  const participantIds = participants.map((user) => user.id);
+  const splits = fairSplit(expense.totalAmount || 0, participantIds);
 
   const values = [
-    ...splits.map((split, index) => {
+    ...Array.from(splits?.entries() || []).map(([userId, amount]) => {
       return {
-        userId: users[index].id,
+        userId,
         expenseId: expense.id,
-        amount: -split,
+        amount: -amount,
         type: "share",
       };
     }),
@@ -232,23 +250,24 @@ const insertedRatioExpenses = await db
   .values(ratioExpenses)
   .returning();
 
-insertedRatioExpenses.forEach(async (expense) => {
-  const randomUserIndex = Math.floor(Math.random() * users.length);
-  const creditor = users[randomUserIndex];
-  const debtors = users.toSpliced(randomUserIndex);
-  const ratio = Array.from({ length: users.length }, () =>
-    Math.ceil(Math.random() * 4)
+insertedRatioExpenses.forEach(async (expense, index) => {
+  // First few expenses have everyone, then mix it up
+  const participants = index < 2 ? users : getRandomParticipants(users);
+  const randomParticipantIndex = Math.floor(Math.random() * participants.length);
+  const creditor = participants[randomParticipantIndex];
+  const ratioMap = new Map(
+    participants.map((user) => [user.id, Math.ceil(Math.random() * 4)])
   );
-  const splits = ratioSplit(expense.totalAmount || 0, ratio);
+  const splits = ratioSplit(expense.totalAmount || 0, ratioMap);
 
   const values = [
-    ...splits.map((split, index) => {
+    ...Array.from(splits?.entries() || []).map(([userId, amount]) => {
       return {
-        userId: users[index].id,
+        userId,
         expenseId: expense.id,
-        amount: -split,
+        amount: -amount,
         type: "share",
-        shareRatio: ratio[index],
+        shareRatio: ratioMap.get(userId),
       };
     }),
     {

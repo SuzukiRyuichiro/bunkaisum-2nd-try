@@ -11,7 +11,7 @@
         <div class="flex-1 min-w-0">
           <div class="text-slate-900">{{ expense?.title }}</div>
           <div class="text-sm text-slate-600 mt-0.5">
-            {{ expense?.user.displayName }} paid •
+            {{ expense?.user.displayName }}が支払い
             {{ expense?.paidAt }}
           </div>
         </div>
@@ -24,7 +24,9 @@
               }).format(expense?.totalAmount || 0)
             }}
           </div>
-          <div class="text-xs text-slate-500 mt-0.5">3 people</div>
+          <div class="text-xs text-slate-500 mt-0.5">
+            {{ expense.participantCount }}人
+          </div>
         </div>
       </div>
     </button>

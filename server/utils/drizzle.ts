@@ -9,5 +9,7 @@ export default function useDrizzle(event: H3Event) {
 
 export type Expense = typeof schema.expensesTable.$inferSelect;
 export type User = typeof schema.usersTable.$inferSelect;
-export type ExpenseWithUser = Expense & { user: User };
+export type ExpenseWithUser = Expense & { user: User } & {
+  participantCount: number;
+};
 export type OAuthAccounts = typeof schema.oAuthAccountsTable.$inferSelect;
