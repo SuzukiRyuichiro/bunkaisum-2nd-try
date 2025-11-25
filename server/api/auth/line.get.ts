@@ -9,7 +9,9 @@ export default defineOAuthLineEventHandler({
       provider: "line",
     });
 
-    await setUserSession(event, { user: ourUser });
+    await setUserSession(event, {
+      user: ourUser,
+    });
 
     return sendRedirect(event, "/");
   },

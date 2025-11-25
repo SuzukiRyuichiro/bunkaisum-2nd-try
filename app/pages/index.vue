@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="px-6 py-8">
       <div class="flex items-center gap-3">
-        <p class="text-4xl">💸</p>
+        <p class="text-4xl cursor-pointer" @dblclick="logout">💸</p>
         <div>
           <h1 className="text-slate-900">Bunkaisum</h1>
           <p className="text-sm text-slate-600">みんなで割り勘アプリ</p>
@@ -22,6 +22,18 @@
 </template>
 
 <script setup lang="ts">
+const { clear } = useUserSession();
+
+const router = useRouter();
+
+const logout = () => {
+  clear();
+  router.push("/login");
+};
+
+definePageMeta({
+  middleware: ["authenticated"],
+});
 const items = [
   {
     label: "出納表",

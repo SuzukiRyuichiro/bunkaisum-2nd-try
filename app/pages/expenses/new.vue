@@ -213,6 +213,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "back",
+  middleware: "authenticated",
+});
 import Card from "~/components/misc/Card.vue";
 import {
   CalendarDate,
@@ -222,9 +226,6 @@ import {
   type DateValue,
 } from "@internationalized/date";
 
-definePageMeta({
-  layout: "back",
-});
 const config = useRuntimeConfig();
 
 const { data: users } = await useFetch("/api/users");
