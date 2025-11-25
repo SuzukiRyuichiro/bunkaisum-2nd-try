@@ -31,9 +31,6 @@ const logout = () => {
   router.push("/login");
 };
 
-definePageMeta({
-  middleware: ["authenticated"],
-});
 const items = [
   {
     label: "出納表",

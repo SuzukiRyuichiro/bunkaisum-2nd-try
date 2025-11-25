@@ -215,7 +215,6 @@
 <script setup lang="ts">
 definePageMeta({
   layout: "back",
-  middleware: "authenticated",
 });
 import Card from "~/components/misc/Card.vue";
 import {
