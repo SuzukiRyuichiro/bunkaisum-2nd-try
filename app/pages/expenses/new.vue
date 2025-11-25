@@ -139,27 +139,33 @@
             <template #ratio>
               <h3>比率で割り勘</h3>
               <USeparator class="my-3" />
-              <div class="grid gap-3">
-                <div
+              <div
+                class="grid grid-cols-[min-content_1fr_min-content] gap-y-4 gap-x-2 items-center"
+              >
+                <template
                   v-for="involvement in shareInvolvements"
-                  class="flex w-full justify-between items-center"
+                  :key="involvement.userId"
                 >
-                  <span>{{ involvement.user?.displayName }}</span>
-                  <div class="flex gap-4 items-center">
-                    <UInputNumber
-                      :value="splitRatio.get(involvement.userId)"
-                      @update:modelValue="
-                        (v) => splitRatio.set(involvement.userId, v)
-                      "
-                      :min="1"
-                      :max="20"
-                      orientation="vertical"
-                      size="xs"
-                      class="w-16"
-                    />
-                    <span>¥{{ -involvement.amount || 0 }}</span>
+                  <p class="text-nowrap">{{ involvement.user?.displayName }}</p>
+                  <div class="flex place-self-end self-center gap-2">
+                    <p>{{ splitRatio.get(involvement.userId) }}x</p>
+                    <UFieldGroup>
+                      <UButton
+                        size="xs"
+                        icon="i-lucide-minus"
+                        @click="decrementRatio(involvement.userId || 0)"
+                      />
+                      <UButton
+                        size="xs"
+                        icon="i-lucide-plus"
+                        @click="incrementRatio(involvement.userId || 0)"
+                      />
+                    </UFieldGroup>
                   </div>
-                </div>
+                  <p class="place-self-end self-center">
+                    ¥{{ -involvement.amount || 0 }}
+                  </p>
+                </template>
               </div>
             </template>
             <template #manual>
@@ -246,6 +252,22 @@ const dateFormatter = new DateFormatter("ja-JP", {
 const splitRatio = ref(
   new Map(formState.value?.participantIds?.map((id) => [id, 1]))
 );
+
+const incrementRatio = (userId: number) => {
+  const ratio = splitRatio.value.get(userId);
+
+  if (ratio === undefined) return;
+
+  splitRatio.value.set(userId, ratio + 1);
+};
+
+const decrementRatio = (userId: number) => {
+  const ratio = splitRatio.value.get(userId) || 0;
+
+  if (ratio < 1) return;
+
+  splitRatio.value.set(userId, ratio - 1);
+};
 
 const manualSplit = ref(
   new Map(formState.value?.participantIds?.map((id) => [id, 0]))
