@@ -103,7 +103,14 @@
           >
             <template #label="{ item }">
               <div class="flex gap-3 items-center">
-                <UAvatar src="https://github.com/benjamincanac.png" />
+                <UAvatar
+                  :src="
+                    expense?.user?.profilePictureUrl
+                      ? expense?.user?.profilePictureUrl
+                      : 'https://github.com/benjamincanac.png'
+                  "
+                  size="2xl"
+                />
                 <p>{{ item?.displayName }}</p>
               </div>
             </template>

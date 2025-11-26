@@ -18,7 +18,14 @@
       </template>
       <div class="flex gap-2 items-center">
         <div class="grow flex gap-4">
-          <UAvatar src="https://github.com/benjamincanac.png" size="2xl" />
+          <UAvatar
+            :src="
+              expense?.user?.profilePictureUrl
+                ? expense?.user?.profilePictureUrl
+                : 'https://github.com/benjamincanac.png'
+            "
+            size="2xl"
+          />
           <div>
             <h3 class="" font-semibold>
               {{ expense?.user?.displayName }}
