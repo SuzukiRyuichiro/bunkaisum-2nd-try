@@ -6,3 +6,16 @@
   --ui-radius: 0.25rem;
   --ui-bg: var(--color-slate-50);
 }
+
+@theme {
+  --animate-wiggle: wiggle 0.3s ease-in-out infinite;
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: translateX(-8px);
+    }
+    50% {
+      transform: translateX(8px);
+    }
+  }
+}
