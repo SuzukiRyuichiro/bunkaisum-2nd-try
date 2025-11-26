@@ -5,11 +5,10 @@
     </div>
     <UForm
       class="grid gap-4"
-      :schema="schema"
+      :schema="expenseSchema"
       :state="formState"
       @submit="handleFormSubmit"
     >
-      <p>{{ formState }}</p>
       <Card>
         <UFormField label="件名" name="title">
           <UInput
@@ -112,8 +111,12 @@
         </UFormField>
       </Card>
 
-      <Card>
-        <UFormField label="割り勘の方法">
+      <Card ref="splitFormCard">
+        <UFormField
+          label="割り勘の方法"
+          name="splitType"
+          :error="involvementError"
+        >
           <UTabs
             v-model="formState.splitType"
             :items="splitOptions"
@@ -177,6 +180,7 @@
                     type="number"
                     size="xs"
                     :min="0"
+                    icon="i-lucide-japanese-yen"
                     @change="
                       handleManualSplitChange($event, involvement.userId)
                     "
@@ -228,7 +232,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { data: users } = await useFetch("/api/users");
 
-const formState = ref<Partial<Schema>>({
+const formState = ref<Partial<ExpenseSchema>>({
   totalAmount: 0,
   emoji: "",
   title: "",
@@ -307,8 +311,12 @@ const handleManualSplitChange = (event: Event, userId: number | null) => {
   remainingFairSplit?.keys().forEach((id) => {
     manualSplit.value.set(id, remainingFairSplit.get(id));
   });
-  // If there is no one to split (everyone manual, make it as is)
+
+  checkInvolvementsValidityAndApplyError();
 };
+
+const splitFormCard = ref();
+const involvementError = ref<boolean | string>(false);
 
 const resetManualSplit = () => {
   manualSplit.value = new Map(
@@ -344,12 +352,14 @@ const involvements = computed(() => {
         user: users.value?.find((user) => user.id === id),
         type: "share",
         amount: -(split?.get(id) || 0),
+        shareRatio: null,
       })) || []),
       {
         userId: formState.value.userId,
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
         amount: formState.value.totalAmount,
+        shareRatio: null,
       },
     ];
   } else if (formState.value.splitType === "ratio") {
@@ -367,6 +377,7 @@ const involvements = computed(() => {
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
         amount: formState.value.totalAmount,
+        shareRatio: null,
       },
     ];
   } else if (formState.value.splitType === "manual") {
@@ -377,12 +388,14 @@ const involvements = computed(() => {
         user: users.value?.find((user) => user.id === id),
         type: "share",
         amount: -(split?.get(id) || 0),
+        shareRatio: null,
       })) || []),
       {
         userId: formState.value.userId,
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
         amount: formState.value.totalAmount,
+        shareRatio: null,
       },
     ];
   }
@@ -396,7 +409,7 @@ const shareInvolvements = computed(() =>
 
 // Form schema
 
-const schema = z.object({
+const expenseSchema = z.object({
   title: z.string().min(1, "件名を入力してください"),
   emoji: z.emoji("絵文字をえらんでください"),
   totalAmount: z.int().min(1, "1円以上の金額を入力してください"),
@@ -408,15 +421,83 @@ const schema = z.object({
   participantIds: z.array(z.int()).min(1, "1人以上参加者を選んでください"),
 });
 
-type Schema = z.output<typeof schema>;
+const involvementsSchema = z
+  .array(
+    z
+      .object({
+        userId: z.number(),
+        amount: z.number(),
+        shareRatio: z.number().nullable().optional(),
+        type: z.enum(["share", "payment"]),
+        user: z.object(),
+      })
+      .omit({ user: true })
+      .refine(
+        (data) => {
+          return data.type === "share" ? data.amount <= 0 : data.amount >= 0;
+        },
+        {
+          error: "額がマイナスです",
+        }
+      )
+  )
+  .refine(
+    (items) => {
+      const sum = items.reduce((acc, item) => acc + item.amount, 0);
+      return sum === 0;
+    },
+    { error: "合計額が合いません" }
+  )
+  .min(2, "1人以上割り勘に参加する必要があります");
 
-const handleFormSubmit = (event: FormSubmitEvent<Schema>) => {
+type ExpenseSchema = z.output<typeof expenseSchema>;
+
+const handleFormSubmit = async (event: FormSubmitEvent<ExpenseSchema>) => {
   // Validate the involvements array
+  checkInvolvementsValidityAndApplyError();
   // Build the object to submit
-  // { expense: {}, involvements: {} }
-  // Make a post request to the API
+  const payload = {
+    expense: {
+      title: formState.value.title,
+      totalAmount: formState.value.totalAmount,
+      emoji: formState.value.emoji,
+      paidAt: formState.value.paidAt,
+      userId: formState.value.userId,
+      splitType: formState.value.splitType,
+    },
+    involvements: involvements.value.map(
+      ({ userId, amount, type, shareRatio }) => ({
+        userId,
+        amount,
+        type,
+        shareRatio,
+      })
+    ),
+  };
+
+  const response = await $fetch("/api/expenses", {
+    method: "POST",
+    body: payload,
+  });
   // On success, redirect the user to the show page
-  // On error, display the error
+
+  if (response.success) {
+    navigateTo(`/expenses/${response.id}`);
+  }
+};
+
+const checkInvolvementsValidityAndApplyError = () => {
+  const { success } = involvementsSchema.safeParse(involvements.value);
+
+  if (!success) {
+    involvementError.value = "割り勘にエラーがあります";
+    splitFormCard.value?.root?.classList.add("animate-wiggle");
+    setTimeout(() => {
+      splitFormCard.value?.root?.classList.remove("animate-wiggle");
+    }, 900);
+  } else {
+    involvementError.value = false;
+  }
 };
 
 const items = ["🍕", "☕️", "🍺", "🧻", "✈️", "🛒", "🎉", "💸"];

@@ -5,7 +5,6 @@ export default defineEventHandler(async (event) => {
   // Here I wanna use Drizzle
   const db = useDrizzle(event);
   const { expense, involvements } = await readBody(event);
-
   const { user } = await requireUserSession(event);
 
   // // Insert expense
@@ -16,16 +15,16 @@ export default defineEventHandler(async (event) => {
     .values({ userId: user.id, ...expense })
     .returning();
 
-  const newInvolvements = await db
-    .insert(involvementsTable)
-    .values(
-      involvements.map((involvement) => ({
-        ...involvement,
-        expenseId: newExpense.id,
-      }))
-    )
-    .returning();
+  const newInvolvements = await db.insert(involvementsTable).values(
+    involvements.map((involvement) => ({
+      ...involvement,
+      expenseId: newExpense.id,
+    }))
+  );
 
   // return newExpense;
-  return newInvolvements;
+  return {
+    success: true,
+    id: newExpense.id,
+  };
 });

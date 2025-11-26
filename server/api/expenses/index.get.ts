@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     with: {
       user: true,
     },
+    orderBy: (expensesTable, { desc }) => [desc(expensesTable.createdAt)],
     extras: {
       participantCount:
         sql`(select count(*) from "involvements" where "involvements"."expenseId" = "expensesTable"."id" and "involvements"."type" = 'share')`.as(
