@@ -105,8 +105,8 @@
               <div class="flex gap-3 items-center">
                 <UAvatar
                   :src="
-                    expense?.user?.profilePictureUrl
-                      ? expense?.user?.profilePictureUrl
+                    item?.profilePictureUrl
+                      ? item?.profilePictureUrl
                       : 'https://github.com/benjamincanac.png'
                   "
                   size="2xl"
