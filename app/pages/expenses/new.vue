@@ -1,15 +1,15 @@
 <template>
   <div class="pb-10">
-    <Meta
-      v-if="config.public.enableEmojiSuggestions"
-      http-equiv="origin-trial"
-      content="Ay9zgWOzVsfIJ97aKTvjzn6TAUKOKShK05ozaYMbNhuW67sq9wyY97qdI6Bqp28kmUjZrevZzrKIw/kP0h2aagYAAACOeyJvcmlnaW4iOiJodHRwczovL3J5dWljaGlyb3N1enVraS5jb206NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="
-    />
     <div class="py-2">
       <h1 class="text-lg font-semibold">新しい支払いを記録する</h1>
     </div>
-    <UForm class="grid gap-4">
-      <progress ref="progress" hidden="" id="progress" value="0"></progress>
+    <UForm
+      class="grid gap-4"
+      :schema="schema"
+      :state="formState"
+      @submit="handleFormSubmit"
+    >
+      <p>{{ formState }}</p>
       <Card>
         <UFormField label="件名" name="title">
           <UInput
@@ -24,23 +24,24 @@
       </Card>
 
       <Card>
-        <URadioGroup
-          indicator="hidden"
-          legend="絵文字を選んでね"
-          variant="card"
-          size="md"
-          :ui="{
-            item: 'text-3xl bg-elevated/50 has-data-[state=checked]:bg-primary/10 has-data-[state=checked]:border-primary/10',
-            fieldset: 'flex-wrap',
-          }"
-          default-value="System"
-          orientation="horizontal"
-          v-model="formState.emoji"
-          :items="items"
-        />
+        <UFormField label="絵文字を選んでね" name="emoji">
+          <URadioGroup
+            indicator="hidden"
+            variant="card"
+            size="md"
+            :ui="{
+              item: 'text-3xl bg-elevated/50 has-data-[state=checked]:bg-primary/10 has-data-[state=checked]:border-primary/10',
+              fieldset: 'flex-wrap',
+            }"
+            default-value="System"
+            orientation="horizontal"
+            v-model="formState.emoji"
+            :items="items"
+          />
+        </UFormField>
       </Card>
       <Card>
-        <UFormField label="合計額" name="total amount">
+        <UFormField label="合計額" name="totalAmount">
           <UInputNumber
             class="w-full"
             variant="soft"
@@ -58,7 +59,7 @@
       </Card>
 
       <Card>
-        <UFormField label="支払った人" name="paid by">
+        <UFormField label="支払った人" name="userId">
           <USelect
             placeholder="一人選んでください"
             size="lg"
@@ -72,7 +73,7 @@
       </Card>
 
       <Card>
-        <UFormField label="支払った日" name="paid at">
+        <UFormField label="支払った日" name="paidAt">
           <UPopover>
             <UButton
               color="neutral"
@@ -80,40 +81,35 @@
               icon="i-lucide-calendar"
               class="w-full"
             >
-              {{
-                formState.paidAt
-                  ? dateFormatter.format(
-                      formState.paidAt.toDate(getLocalTimeZone())
-                    )
-                  : "Select a date"
-              }}
+              {{ formState.paidAt ? formState.paidAt : "Select a date" }}
             </UButton>
 
             <template #content>
-              <UCalendar v-model="formState.paidAt" class="p-2" />
+              <UCalendar v-model="calendarDate" class="p-2" />
             </template>
           </UPopover>
         </UFormField>
       </Card>
       <Card>
-        <UCheckboxGroup
-          legend="参加者"
-          v-model="formState.participantIds"
-          @update:model-value="recalculateSplitRatio"
-          :items="users"
-          value-key="id"
-          :ui="{
-            item: 'items-center',
-            fieldset: 'gap-3',
-          }"
-        >
-          <template #label="{ item }">
-            <div class="flex gap-3 items-center">
-              <UAvatar src="https://github.com/benjamincanac.png" />
-              <p>{{ item?.displayName }}</p>
-            </div>
-          </template>
-        </UCheckboxGroup>
+        <UFormField label="参加者" name="participantIds">
+          <UCheckboxGroup
+            v-model="formState.participantIds"
+            @update:model-value="recalculateSplitRatio"
+            :items="users"
+            value-key="id"
+            :ui="{
+              item: 'items-center',
+              fieldset: 'gap-3',
+            }"
+          >
+            <template #label="{ item }">
+              <div class="flex gap-3 items-center">
+                <UAvatar src="https://github.com/benjamincanac.png" />
+                <p>{{ item?.displayName }}</p>
+              </div>
+            </template>
+          </UCheckboxGroup>
+        </UFormField>
       </Card>
 
       <Card>
@@ -177,19 +173,14 @@
                   class="flex w-full justify-between items-center"
                 >
                   <span>{{ involvement.user?.displayName }}</span>
-                  <UInputNumber
+                  <UInput
+                    type="number"
                     size="xs"
-                    orientation="vertical"
                     :min="0"
-                    :value="manualSplit.get(involvement.userId)"
-                    @update:modelValue="
-                      (v) => manualSplit.set(involvement.userId, v)
+                    @change="
+                      handleManualSplitChange($event, involvement.userId)
                     "
-                    :format-options="{
-                      style: 'currency',
-                      currency: 'JPY',
-                      currencyDisplay: 'symbol',
-                    }"
+                    :value="manualSplit.get(involvement.userId)"
                   />
                 </div>
               </div>
@@ -201,6 +192,7 @@
               >
                 <USeparator class="my-3" />
                 <p class="text-error-500">合計額が合いません</p>
+                <UButton @click="resetManualSplit">リセット</UButton>
               </div>
             </template>
           </UTabs>
@@ -212,6 +204,7 @@
         color="success"
         :leading="false"
         :ui="{ base: 'justify-center' }"
+        type="submit"
         >💾 追加</UButton
       >
     </UForm>
@@ -224,25 +217,32 @@ definePageMeta({
 });
 import Card from "~/components/misc/Card.vue";
 import {
-  CalendarDate,
   DateFormatter,
   getLocalTimeZone,
   today,
-  type DateValue,
+  parseDate,
 } from "@internationalized/date";
-
-const config = useRuntimeConfig();
+import type { CalendarDate } from "@internationalized/date";
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { data: users } = await useFetch("/api/users");
 
-const formState = ref({
+const formState = ref<Partial<Schema>>({
   totalAmount: 0,
   emoji: "",
   title: "",
-  userId: null,
+  userId: undefined,
   participantIds: users.value?.map((u) => u.id),
   splitType: "equal",
-  paidAt: today(getLocalTimeZone()),
+  paidAt: today(getLocalTimeZone()).toString(),
+});
+
+const calendarDate = computed({
+  get: () => parseDate(formState.value.paidAt || ""),
+  set: (value: CalendarDate) => {
+    formState.value.paidAt = value.toString();
+  },
 });
 
 const dateFormatter = new DateFormatter("ja-JP", {
@@ -273,6 +273,53 @@ const manualSplit = ref(
   new Map(formState.value?.participantIds?.map((id) => [id, 0]))
 );
 
+const haveManuallySetSplit = ref(
+  new Map(formState.value?.participantIds?.map((id) => [id, false]))
+);
+
+const handleManualSplitChange = (event: Event, userId: number | null) => {
+  if (userId == null) return;
+  haveManuallySetSplit.value.set(userId, true);
+  manualSplit.value.set(userId, Number.parseInt(event.target.value));
+
+  // Do the automatic split
+  // Count how many people are in the fair split
+  const manuallySplitParticipantIds = [...haveManuallySetSplit.value]
+    .filter(([_, value]) => value)
+    .map(([key, _]) => key);
+  const notManuallySplitParticipantIds = [...haveManuallySetSplit.value]
+    .filter(([_, value]) => !value)
+    .map(([key, _]) => key);
+
+  const manualTotal = manuallySplitParticipantIds.reduce(
+    (acc, cv) => (acc += manualSplit.value.get(cv)),
+    0
+  );
+
+  // Calculate how much money there are left to split
+  const remainder = formState.value.totalAmount - manualTotal;
+
+  const remainingFairSplit = fairSplit(
+    remainder,
+    notManuallySplitParticipantIds
+  );
+
+  remainingFairSplit?.keys().forEach((id) => {
+    manualSplit.value.set(id, remainingFairSplit.get(id));
+  });
+  // If there is no one to split (everyone manual, make it as is)
+};
+
+const resetManualSplit = () => {
+  manualSplit.value = new Map(
+    formState.value?.participantIds?.map((id) => [id, 0])
+  );
+
+  haveManuallySetSplit.value = new Map(
+    formState.value?.participantIds?.map((id) => [id, false])
+  );
+};
+
 const recalculateSplitRatio = () => {
   splitRatio.value = new Map(
     formState.value?.participantIds?.map((id) => [
@@ -280,6 +327,8 @@ const recalculateSplitRatio = () => {
       splitRatio.value?.get(id) || 1,
     ])
   );
+
+  resetManualSplit();
 };
 
 const involvements = computed(() => {
@@ -344,6 +393,31 @@ const involvements = computed(() => {
 const shareInvolvements = computed(() =>
   involvements.value.filter((involvement) => involvement.type === "share")
 );
+
+// Form schema
+
+const schema = z.object({
+  title: z.string().min(1, "件名を入力してください"),
+  emoji: z.emoji("絵文字をえらんでください"),
+  totalAmount: z.int().min(1, "1円以上の金額を入力してください"),
+  userId: z.int("支払った人を選んでください"),
+  paidAt: z.preprocess((val: CalendarDate) => {
+    return val.toString();
+  }, z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+  splitType: z.enum(["equal", "ratio", "manual"]),
+  participantIds: z.array(z.int()).min(1, "1人以上参加者を選んでください"),
+});
+
+type Schema = z.output<typeof schema>;
+
+const handleFormSubmit = (event: FormSubmitEvent<Schema>) => {
+  // Validate the involvements array
+  // Build the object to submit
+  // { expense: {}, involvements: {} }
+  // Make a post request to the API
+  // On success, redirect the user to the show page
+  // On error, display the error
+};
 
 const items = ["🍕", "☕️", "🍺", "🧻", "✈️", "🛒", "🎉", "💸"];
 
