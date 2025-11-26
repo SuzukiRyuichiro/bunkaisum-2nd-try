@@ -40,7 +40,10 @@ export const findOrCreateUserFromOAuth = async ({
     // Step 2: create the oauth record
     const [user] = await db
       .insert(usersTable)
-      .values({ displayName: profile.displayName })
+      .values({
+        displayName: profile.displayName,
+        profilePictureUrl: profile.pictureUrl,
+      })
       .returning();
 
     await db.insert(oAuthAccountsTable).values({
