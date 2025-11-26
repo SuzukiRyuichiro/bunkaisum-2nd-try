@@ -65,7 +65,14 @@
           )"
           class="flex gap-4 justify-between items-center"
         >
-          <UAvatar src="https://github.com/benjamincanac.png" size="xl" />
+          <UAvatar
+            :src="
+              involvement?.user?.profilePictureUrl
+                ? involvement?.user?.profilePictureUrl
+                : 'https://github.com/benjamincanac.png'
+            "
+            size="xl"
+          />
           <p class="grow font-lg font-medium">
             {{ involvement.user?.displayName }}
             <span class="text-muted text-xs" v-if="involvement.shareRatio"
