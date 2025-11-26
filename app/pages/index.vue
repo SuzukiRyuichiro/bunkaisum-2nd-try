@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="px-6 py-8">
+    <div class="px-2 py-8">
       <div class="flex items-center gap-3">
         <p class="text-4xl cursor-pointer" @dblclick="logout">💸</p>
         <div>
