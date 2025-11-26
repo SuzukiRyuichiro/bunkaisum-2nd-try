@@ -71,6 +71,13 @@
       "when": 1763531686295,
       "tag": "0009_slippery_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1764145131363,
+      "tag": "0010_keen_guardsmen",
+      "breakpoints": true
     }
   ]
 }

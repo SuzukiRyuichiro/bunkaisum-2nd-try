@@ -26,6 +26,7 @@ export const expensesTable = sqliteTable("expenses", {
 export const usersTable = sqliteTable("users", {
   id: int().primaryKey({ autoIncrement: true }),
   displayName: text(),
+  profilePictureUrl: text(),
   ...timestamps,
 });
 
