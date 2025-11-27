@@ -127,6 +127,13 @@
       "when": 1764228691626,
       "tag": "0017_cold_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1764241874750,
+      "tag": "0018_striped_whistler",
+      "breakpoints": true
     }
   ]
 }
