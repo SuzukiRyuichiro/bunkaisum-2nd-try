@@ -239,13 +239,34 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 const { data: users } = await useFetch("/api/users");
 
+// Get query parameters from route
+const route = useRoute();
+const queryParams = route.query;
+
+// Parse query parameters for form initialization
+const initialTotalAmount = queryParams.totalAmount
+  ? Number(queryParams.totalAmount)
+  : 0;
+const initialUserId = queryParams.userId ? Number(queryParams.userId) : undefined;
+const initialCreditorId = queryParams.creditorId
+  ? Number(queryParams.creditorId)
+  : undefined;
+const initialTitle = queryParams.title ? String(queryParams.title) : "";
+const initialEmoji = queryParams.emoji ? String(queryParams.emoji) : "";
+const initialSplitType = queryParams.type === "manual" ? "manual" : "equal";
+
+// If creditorId is provided, set participantIds to only include the creditor
+const initialParticipantIds = initialCreditorId
+  ? [initialCreditorId]
+  : users.value?.map((u) => u.id);
+
 const formState = ref<Partial<ExpenseSchema>>({
-  totalAmount: 0,
-  emoji: "",
-  title: "",
-  userId: undefined,
-  participantIds: users.value?.map((u) => u.id),
-  splitType: "equal",
+  totalAmount: initialTotalAmount,
+  emoji: initialEmoji,
+  title: initialTitle,
+  userId: initialUserId,
+  participantIds: initialParticipantIds,
+  splitType: initialSplitType,
   paidAt: today(getLocalTimeZone()).toString(),
 });
 
@@ -280,12 +301,25 @@ const decrementRatio = (userId: number) => {
   splitRatio.value.set(userId, ratio - 1);
 };
 
-const manualSplit = ref(
-  new Map(formState.value?.participantIds?.map((id) => [id, 0]))
+// Initialize manual split - if we have a creditor and manual type, set the full amount
+const initialManualSplitMap = new Map(
+  formState.value?.participantIds?.map((id) => [
+    id,
+    initialCreditorId === id && initialSplitType === "manual"
+      ? initialTotalAmount
+      : 0,
+  ])
 );
 
+const manualSplit = ref(initialManualSplitMap);
+
 const haveManuallySetSplit = ref(
-  new Map(formState.value?.participantIds?.map((id) => [id, false]))
+  new Map(
+    formState.value?.participantIds?.map((id) => [
+      id,
+      initialCreditorId === id && initialSplitType === "manual",
+    ])
+  )
 );
 
 const handleManualSplitChange = (event: Event, userId: number | null) => {
