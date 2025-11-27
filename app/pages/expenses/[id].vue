@@ -2,7 +2,16 @@
   <div class="flex gap-8 mt-5">
     <p class="text-5xl">{{ expense?.emoji }}</p>
     <div class="grow">
-      <h1 class="text-xl font-semibold">{{ expense?.title }}</h1>
+      <div class="flex gap-2 items-center">
+        <h1 class="text-xl font-semibold">{{ expense?.title }}</h1>
+        <UButton
+          icon="i-lucide-pen"
+          size="xs"
+          color="neutral"
+          variant="ghost"
+          :to="`/expenses/${expense?.id}/edit`"
+        />
+      </div>
       <p class="text-sm text-slate-600">支払日: {{ expense?.paidAt }}</p>
     </div>
   </div>
