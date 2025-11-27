@@ -27,11 +27,29 @@ console.log("Seeding users and expenses 🌱");
 const users = await db
   .insert(schema.usersTable)
   .values([
-    { displayName: "Scooter" },
-    { displayName: "楓" },
-    { displayName: "恒河" },
-    { displayName: "ななこ" },
-    { displayName: "きょうちゃん" },
+    {
+      displayName: "Scooter",
+      profilePictureUrl:
+        "https://profile.line-scdn.net/0hZuO-jXPgBVpiVBtI3WV7ZBIEBjBBJVxIHGBCNQBXWjlcYUYPGTQdOF9UXW5XbUEJRjsdOV5cCWhAGABYOTo9WTEwXg5eCgBwEWdLbxw1Ij4vFxJ0CGI8O1RcWGo6ATFfKC5IQRBcLB8JJz94OmYaYjY_LjxaEAZuMANpDGdma9kNVnIPTzNDOV5cU27f",
+    },
+    {
+      displayName: "楓",
+      profilePictureUrl:
+        "https://profile.line-scdn.net/0h3P04sdyXbH8dTX0xOxkSAG0dbxU-PDVtZXsqGiBEYEYnei4tMSx0TSBINhogLiMgMC50HCkYNxoRXhsZAxuQSxp9MU4hdC4gOSMnmQ",
+    },
+    {
+      displayName: "恒河",
+      profilePictureUrl:
+        "https://profile.line-scdn.net/0hMIsg80Z-EmZeHgwnta9sWC5OEQx9b0t0c35UATkcTQFgLFZkIXhUAGgaTVczJwBkdnEOAW5LHgV8eQM3FiMbeRJgDgsRTg42AQhfUBxONQs3S0k3GxYnAw9aCjRkLlVOFzwqfWxDTioYUFVRCgYYZ2lBBV4Rcy1PCEl-MFssfOUxHGUzc3lUBWIWRFLj",
+    },
+    {
+      displayName: "ななこ",
+      profilePictureUrl: "https://placehold.jp/150x150.png",
+    },
+    {
+      displayName: "きょうちゃん",
+      profilePictureUrl: "https://placehold.jp/150x150.png",
+    },
   ])
   .returning();
 

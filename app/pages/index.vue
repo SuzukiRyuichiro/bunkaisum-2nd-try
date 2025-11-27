@@ -16,7 +16,9 @@
         <ExpensesTab class="pt-4" />
       </template>
 
-      <template #balance></template>
+      <template #balance>
+        <BalancesTab class="pt-4" />
+      </template>
     </UTabs>
   </div>
 </template>
