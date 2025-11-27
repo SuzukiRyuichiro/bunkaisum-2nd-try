@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:native": "tauri dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -23,6 +24,8 @@
     "@miniflare/shared": "^2.14.4",
     "@nuxt/icon": "^2.1.0",
     "@nuxt/ui": "^4.1.0",
+    "@tauri-apps/api": "^2.9.0",
+    "@tauri-apps/cli": "^2.9.4",
     "better-sqlite3": "^12.4.1",
     "drizzle-orm": "^0.44.7",
     "drizzle-seed": "^0.3.1",

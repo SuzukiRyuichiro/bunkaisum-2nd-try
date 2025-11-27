@@ -30,4 +30,5 @@ export default defineNuxtConfig({
   ui: {
     colorMode: false,
   },
+  ssr: false,
 });
