@@ -15,6 +15,7 @@ const db = drizzle(new D1Database(new D1DatabaseAPI(sqliteDb)), {
 
 console.log("cleaning...🧹");
 
+await db.delete(schema.oAuthAccountsTable);
 await db.delete(schema.involvementsTable);
 await db.delete(schema.expensesTable);
 await db.delete(schema.usersTable);
@@ -161,7 +162,8 @@ const getRandomParticipants = (
   }
 
   // Random subset: 2 to (users.length - 1) people
-  const count = Math.floor(Math.random() * (allUsers.length - minCount + 1)) + minCount;
+  const count =
+    Math.floor(Math.random() * (allUsers.length - minCount + 1)) + minCount;
   const shuffled = [...allUsers].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 };
@@ -169,7 +171,9 @@ const getRandomParticipants = (
 insertedExpenses.forEach(async (expense, index) => {
   // First few expenses have everyone, then mix it up
   const participants = index < 3 ? users : getRandomParticipants(users);
-  const randomParticipantIndex = Math.floor(Math.random() * participants.length);
+  const randomParticipantIndex = Math.floor(
+    Math.random() * participants.length
+  );
   const creditor = participants[randomParticipantIndex];
   const participantIds = participants.map((user) => user.id);
   const splits = fairSplit(expense.totalAmount || 0, participantIds);
@@ -253,7 +257,9 @@ const insertedRatioExpenses = await db
 insertedRatioExpenses.forEach(async (expense, index) => {
   // First few expenses have everyone, then mix it up
   const participants = index < 2 ? users : getRandomParticipants(users);
-  const randomParticipantIndex = Math.floor(Math.random() * participants.length);
+  const randomParticipantIndex = Math.floor(
+    Math.random() * participants.length
+  );
   const creditor = participants[randomParticipantIndex];
   const ratioMap = new Map(
     participants.map((user) => [user.id, Math.ceil(Math.random() * 4)])
