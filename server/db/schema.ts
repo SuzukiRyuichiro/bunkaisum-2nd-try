@@ -1,5 +1,5 @@
-import { relations, sql } from "drizzle-orm";
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations, sql, eq, asc } from "drizzle-orm";
+import { int, sqliteTable, sqliteView, text } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
   createdAt: int("createdAt", { mode: "timestamp" })
@@ -87,4 +87,28 @@ export const involvementsRelations = relations(
       references: [expensesTable.id],
     }),
   })
+);
+
+// views
+
+export const balanceView = sqliteView("balanceView").as((queryBuilder) =>
+  queryBuilder
+    .select({
+      userId: involvementsTable.userId,
+      displayName: usersTable.displayName,
+      profilePictureUrl: usersTable.profilePictureUrl,
+      netBalance: sql<number>`SUM(${involvementsTable.amount})`.as(
+        "netBalance"
+      ),
+      status: sql<string>`
+      CASE
+        WHEN SUM(${involvementsTable.amount}) < 0 THEN 'creditor'
+        WHEN SUM(${involvementsTable.amount}) >= 0 THEN 'debtor'
+      END
+    `.as("status"),
+    })
+    .from(involvementsTable)
+    .innerJoin(usersTable, eq(involvementsTable.userId, usersTable.id))
+    .groupBy(involvementsTable.userId, usersTable.displayName)
+    .orderBy(asc(sql`"netBalance"`))
 );

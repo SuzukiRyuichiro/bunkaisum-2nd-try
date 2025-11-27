@@ -358,14 +358,14 @@ const involvements = computed(() => {
         userId: id,
         user: users.value?.find((user) => user.id === id),
         type: "share",
-        amount: -(split?.get(id) || 0),
+        amount: split?.get(id) || 0,
         shareRatio: null,
       })) || []),
       {
         userId: formState.value.userId,
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
-        amount: formState.value.totalAmount,
+        amount: -formState.value.totalAmount,
         shareRatio: null,
       },
     ];
@@ -376,14 +376,14 @@ const involvements = computed(() => {
         userId: id,
         user: users.value?.find((user) => user.id === id),
         type: "share",
-        amount: -(split?.get(id) || 0),
+        amount: split?.get(id) || 0,
         shareRatio: splitRatio.value.get(id),
       })) || []),
       {
         userId: formState.value.userId,
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
-        amount: formState.value.totalAmount,
+        amount: -formState.value.totalAmount,
         shareRatio: null,
       },
     ];
@@ -394,14 +394,14 @@ const involvements = computed(() => {
         userId: id,
         user: users.value?.find((user) => user.id === id),
         type: "share",
-        amount: -(split?.get(id) || 0),
+        amount: split?.get(id) || 0,
         shareRatio: null,
       })) || []),
       {
         userId: formState.value.userId,
         user: users.value?.find((user) => user.id === formState.value.userId),
         type: "payment",
-        amount: formState.value.totalAmount,
+        amount: -formState.value.totalAmount,
         shareRatio: null,
       },
     ];
@@ -441,7 +441,7 @@ const involvementsSchema = z
       .omit({ user: true })
       .refine(
         (data) => {
-          return data.type === "share" ? data.amount <= 0 : data.amount >= 0;
+          return data.type === "payment" ? data.amount <= 0 : data.amount >= 0;
         },
         {
           error: "額がマイナスです",

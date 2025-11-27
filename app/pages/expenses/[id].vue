@@ -35,9 +35,9 @@
         </div>
         <p class="text-red-600 text-xl font-bold">
           ¥{{
-            expense?.involvements.find(
+            (expense?.involvements.find(
               (involvement) => involvement.type == "payment"
-            )?.amount
+            )?.amount || 0) * -1
           }}
         </p>
       </div>
@@ -80,7 +80,7 @@
             >
           </p>
 
-          <span class="font-semibold">¥{{ -involvement.amount }}</span>
+          <span class="font-semibold">¥{{ involvement.amount }}</span>
         </div>
       </div>
     </Card>
@@ -90,6 +90,7 @@
 <script lang="ts" setup>
 definePageMeta({
   layout: "back",
+  backTo: "/",
 });
 import Card from "~~/app/components/misc/Card.vue";
 

@@ -11,12 +11,19 @@
       </div>
     </div>
     <!-- Tabs -->
-    <UTabs :items="items" color="primary" :unmount-on-hide="false">
+    <UTabs
+      :items="items"
+      color="primary"
+      v-model="active"
+      :unmount-on-hide="false"
+    >
       <template #expenses>
         <ExpensesTab class="pt-4" />
       </template>
 
-      <template #balance></template>
+      <template #balances>
+        <BalancesTab class="pt-4" />
+      </template>
     </UTabs>
   </div>
 </template>
@@ -36,11 +43,26 @@ const items = [
     label: "出納表",
     icon: "i-lucide-receipt-japanese-yen",
     slot: "expenses",
+    value: "expenses",
   },
   {
     label: "貸借対照表",
     icon: "i-lucide-hand-coins",
-    slot: "balance",
+    slot: "balances",
+    value: "balances",
   },
 ];
+
+const route = useRoute();
+const active = computed({
+  get() {
+    return (route.query.tab as string) || "expenses";
+  },
+  set(tab) {
+    router.push({
+      path: "/",
+      query: { tab },
+    });
+  },
+});
 </script>
