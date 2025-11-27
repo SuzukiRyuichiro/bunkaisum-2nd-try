@@ -51,8 +51,8 @@
                   userId: settlement.from.userId,
                   creditorId: settlement.to.userId,
                   title: `${settlement.from.displayName}から${settlement.to.displayName}の支払い`,
-                  emoji: "💸",
-                  type: 'manual'
+                  emoji: '💸',
+                  type: 'manual',
                 },
               }"
               >精算済み</UButton
