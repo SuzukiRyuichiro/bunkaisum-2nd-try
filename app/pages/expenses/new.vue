@@ -138,7 +138,7 @@
                   class="flex w-full justify-between items-center"
                 >
                   <span>{{ involvement.user?.displayName }}</span>
-                  <span>¥{{ -involvement.amount || 0 }}</span>
+                  <span>¥{{ involvement.amount || 0 }}</span>
                 </div>
               </div>
             </template>
@@ -247,7 +247,9 @@ const queryParams = route.query;
 const initialTotalAmount = queryParams.totalAmount
   ? Number(queryParams.totalAmount)
   : 0;
-const initialUserId = queryParams.userId ? Number(queryParams.userId) : undefined;
+const initialUserId = queryParams.userId
+  ? Number(queryParams.userId)
+  : undefined;
 const initialCreditorId = queryParams.creditorId
   ? Number(queryParams.creditorId)
   : undefined;

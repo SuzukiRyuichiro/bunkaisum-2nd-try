@@ -1,4 +1,4 @@
-import { relations, sql, eq, asc } from "drizzle-orm";
+import { relations, sql, eq, asc, ne } from "drizzle-orm";
 import { int, sqliteTable, sqliteView, text } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
@@ -110,5 +110,6 @@ export const balanceView = sqliteView("balanceView").as((queryBuilder) =>
     .from(involvementsTable)
     .innerJoin(usersTable, eq(involvementsTable.userId, usersTable.id))
     .groupBy(involvementsTable.userId, usersTable.displayName)
+    .having(({ netBalance }) => ne(netBalance, 0))
     .orderBy(asc(sql`"netBalance"`))
 );
