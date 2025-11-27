@@ -1,4 +1,4 @@
-import { relations, sql, eq, desc } from "drizzle-orm";
+import { relations, sql, eq, asc } from "drizzle-orm";
 import { int, sqliteTable, sqliteView, text } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
@@ -102,14 +102,13 @@ export const balanceView = sqliteView("balanceView").as((queryBuilder) =>
       ),
       status: sql<string>`
       CASE
-        WHEN SUM(${involvementsTable.amount}) > 0 THEN 'creditor'
-        WHEN SUM(${involvementsTable.amount}) < 0 THEN 'debtor'
-        ELSE 'Neutral'
+        WHEN SUM(${involvementsTable.amount}) < 0 THEN 'creditor'
+        WHEN SUM(${involvementsTable.amount}) >= 0 THEN 'debtor'
       END
     `.as("status"),
     })
     .from(involvementsTable)
     .innerJoin(usersTable, eq(involvementsTable.userId, usersTable.id))
     .groupBy(involvementsTable.userId, usersTable.displayName)
-    .orderBy(desc(sql<number>`SUM(${involvementsTable.amount})`))
+    .orderBy(asc(sql`"netBalance"`))
 );

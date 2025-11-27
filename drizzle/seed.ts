@@ -201,14 +201,14 @@ insertedExpenses.forEach(async (expense, index) => {
       return {
         userId,
         expenseId: expense.id,
-        amount: -amount,
+        amount: amount,
         type: "share",
       };
     }),
     {
       userId: creditor.id,
       expenseId: expense.id,
-      amount: expense.totalAmount,
+      amount: -expense.totalAmount,
       type: "payment",
     },
   ];
@@ -289,7 +289,7 @@ insertedRatioExpenses.forEach(async (expense, index) => {
       return {
         userId,
         expenseId: expense.id,
-        amount: -amount,
+        amount: amount,
         type: "share",
         shareRatio: ratioMap.get(userId),
       };
@@ -297,7 +297,7 @@ insertedRatioExpenses.forEach(async (expense, index) => {
     {
       userId: creditor.id,
       expenseId: expense.id,
-      amount: expense.totalAmount,
+      amount: -expense.totalAmount,
       type: "payment",
     },
   ];

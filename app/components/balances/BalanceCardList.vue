@@ -18,12 +18,18 @@
         </div>
       </div>
       <p
-        class="text-xl font-bold"
+        class="text-xl font-bold flex items-center"
         :class="[
           balance.status === 'creditor' ? 'text-green-600' : 'text-red-600',
         ]"
       >
-        ¥{{ balance.netBalance }}
+        <UIcon
+          v-if="balance.status === 'creditor'"
+          name="i-lucide-plus"
+          class="size-5"
+        />
+        <UIcon v-else name="i-lucide-minus" class="size-5" />
+        ¥{{ Math.abs(balance.netBalance) }}
       </p>
     </Card>
   </div>
@@ -31,5 +37,5 @@
 
 <script setup lang="ts">
 import Card from "@/components/misc/Card.vue";
-const { status, data: balances } = await useFetch("/api/balances");
+defineProps<{ balances: any[] }>();
 </script>
