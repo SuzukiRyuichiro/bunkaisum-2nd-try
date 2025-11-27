@@ -37,7 +37,6 @@ async function getEmojiSuggestionFromGroq(title: string) {
     },
   });
 
-  console.log(response.choices[0].message.content);
   return response.choices[0].message.content;
 }
 
@@ -46,6 +45,5 @@ export default defineEventHandler(async (event) => {
   const emojiJson = await getEmojiSuggestionFromGroq(title);
 
   const { category } = JSON.parse(emojiJson || '{ "category": "💸" }');
-  console.log(category);
   return category;
 });
