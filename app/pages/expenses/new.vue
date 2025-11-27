@@ -169,7 +169,7 @@
                     </UFieldGroup>
                   </div>
                   <p class="place-self-end self-center">
-                    ¥{{ -involvement.amount || 0 }}
+                    ¥{{ involvement.amount || 0 }}
                   </p>
                 </template>
               </div>
