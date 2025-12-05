@@ -10,26 +10,16 @@
         </div>
       </div>
     </div>
-    <!-- Tabs -->
-    <UTabs
-      :items="items"
-      color="primary"
-      v-model="active"
-      :unmount-on-hide="false"
-    >
-      <template #expenses>
-        <ExpensesTab class="pt-4" />
-      </template>
 
-      <template #balances>
-        <BalancesTab class="pt-4" />
-      </template>
-    </UTabs>
+    <GroupCardList :groups="groups" />
   </div>
 </template>
 
 <script setup lang="ts">
+import GroupCardList from "~/components/groups/GroupCardList.vue";
+
 const { clear } = useUserSession();
+const { status, data: groups } = await useFetch("/api/groups");
 
 const router = useRouter();
 
@@ -37,32 +27,4 @@ const logout = () => {
   clear();
   router.push("/login");
 };
-
-const items = [
-  {
-    label: "出納表",
-    icon: "i-lucide-receipt-japanese-yen",
-    slot: "expenses",
-    value: "expenses",
-  },
-  {
-    label: "貸借対照表",
-    icon: "i-lucide-hand-coins",
-    slot: "balances",
-    value: "balances",
-  },
-];
-
-const route = useRoute();
-const active = computed({
-  get() {
-    return (route.query.tab as string) || "expenses";
-  },
-  set(tab) {
-    router.push({
-      path: "/",
-      query: { tab },
-    });
-  },
-});
 </script>

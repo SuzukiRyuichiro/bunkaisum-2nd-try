@@ -90,7 +90,6 @@
 <script lang="ts" setup>
 definePageMeta({
   layout: "back",
-  backTo: "/",
 });
 import Card from "~~/app/components/misc/Card.vue";
 

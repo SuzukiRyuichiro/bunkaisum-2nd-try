@@ -18,6 +18,7 @@ console.log("cleaning...🧹");
 await db.delete(schema.oAuthAccountsTable);
 await db.delete(schema.involvementsTable);
 await db.delete(schema.expensesTable);
+await db.delete(schema.groupMembersTable);
 await db.delete(schema.usersTable);
 await db.delete(schema.groupsTable);
 
@@ -29,12 +30,15 @@ const [all, dubai, shizuoka] = await db
   .values([
     {
       name: "みんな",
+      emoji: "🏠",
     },
     {
       name: "ドバイ旅行",
+      emoji: "🇦🇪",
     },
     {
       name: "静岡旅行",
+      emoji: "🚙",
     },
   ])
   .returning();
@@ -72,7 +76,10 @@ const users = await db
 const [scooter, kaede, kouga, nanako, kyochan] = users;
 
 const members = await db.insert(schema.groupMembersTable).values([
-  ...users.map((user) => ({ userId: user.id, groupId: all.id })),
+  ...users.map((user) => ({
+    userId: user.id,
+    groupId: all.id,
+  })),
   ...[kouga, kaede, kyochan].map((user) => ({
     userId: user.id,
     groupId: dubai.id,
@@ -297,7 +304,12 @@ const ratioExpenses = [
 
 const insertedRatioExpenses = await db
   .insert(schema.expensesTable)
-  .values(ratioExpenses.map((expense) => ({ ...expense, groupId: all.id })))
+  .values(
+    ratioExpenses.map((expense) => ({
+      ...expense,
+      groupId: all.id,
+    }))
+  )
   .returning();
 
 insertedRatioExpenses.forEach(async (expense, index) => {

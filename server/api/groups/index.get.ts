@@ -5,6 +5,7 @@ export default defineEventHandler(async (event) => {
   const groups = await db.query.groupsTable.findMany({
     with: {
       groupMembers: {
+        columns: {},
         with: {
           user: true,
         },
@@ -12,5 +13,11 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  return groups;
+  return groups.map((group) => {
+    return {
+      ...group,
+      groupMembers: group.groupMembers.map(({ user }) => user),
+      membersCount: group.groupMembers.length,
+    };
+  });
 });

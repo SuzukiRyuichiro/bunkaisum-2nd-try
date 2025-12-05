@@ -13,7 +13,6 @@
 </template>
 
 <script lang="ts" setup>
-import ExpenseCard from "./ExpenseCard.vue";
-
-const { status, data: expenses } = await useFetch("/api/expenses");
+import ExpenseCard from "~/components/expenses/ExpenseCard.vue";
+defineProps<{ expenses: any }>();
 </script>

@@ -7,10 +7,12 @@
       to="/expenses/new"
       >支払いを記録</UButton
     >
-    <ExpenseCardList />
+    <ExpenseCardList :expenses="expenses" />
   </div>
 </template>
 
 <script setup lang="ts">
 import ExpenseCardList from "./ExpenseCardList.vue";
+
+defineProps<{ expenses: any }>();
 </script>

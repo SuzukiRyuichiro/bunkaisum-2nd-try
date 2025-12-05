@@ -61,6 +61,7 @@ export const involvementsTable = sqliteTable("involvements", {
 export const groupsTable = sqliteTable("groups", {
   id: int().primaryKey({ autoIncrement: true }),
   name: text("name"),
+  emoji: text("emoji"),
   ...timestamps,
 });
 
