@@ -237,10 +237,12 @@ import type { CalendarDate } from "@internationalized/date";
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
-const { data: users } = await useFetch("/api/users");
+const route = useRoute();
+const { data: users } = await useFetch(
+  `/api/groups/${route.params.groupId}/users`
+);
 
 // Get query parameters from route
-const route = useRoute();
 const queryParams = route.query;
 
 // Parse query parameters for form initialization

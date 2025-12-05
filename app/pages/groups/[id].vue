@@ -14,7 +14,11 @@
       :unmount-on-hide="false"
     >
       <template #expenses>
-        <ExpensesTab class="pt-4" :expenses="expenses" />
+        <ExpensesTab
+          class="pt-4"
+          :expenses="expenses"
+          :group-id="route.params.id"
+        />
       </template>
 
       <template #balances>

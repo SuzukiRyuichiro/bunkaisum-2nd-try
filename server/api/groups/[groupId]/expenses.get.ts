@@ -4,7 +4,7 @@ import useDrizzle from "~~/server/utils/drizzle";
 
 export default defineEventHandler(async (event) => {
   const db = useDrizzle(event);
-  const groupId = parseInt(getRouterParam(event, "group_id") || "");
+  const groupId = parseInt(getRouterParam(event, "groupId") || "");
 
   if (isNaN(groupId)) throw new Error("Invalid Group ID");
 
