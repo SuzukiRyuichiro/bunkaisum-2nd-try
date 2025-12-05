@@ -97,113 +97,6 @@ const daysAgo = (days: number): string => {
   return date.toISOString().split("T")[0];
 };
 
-// Create 20 expenses
-const expenses = [
-  {
-    title: "トイレットペーパー",
-    emoji: "🧻",
-    totalAmount: 980,
-    paidAt: daysAgo(58),
-    userId: scooter.id,
-  },
-  {
-    title: "居酒屋",
-    emoji: "🍺",
-    totalAmount: 8500,
-    paidAt: daysAgo(55),
-    userId: kaede.id,
-  },
-  {
-    title: "シャンプー・リンス",
-    emoji: "🧴",
-    totalAmount: 1580,
-    paidAt: daysAgo(52),
-    userId: nanako.id,
-  },
-  {
-    title: "焼肉",
-    emoji: "🥩",
-    totalAmount: 12000,
-    paidAt: daysAgo(48),
-    userId: kouga.id,
-  },
-  {
-    title: "洗濯洗剤",
-    emoji: "🧺",
-    totalAmount: 780,
-    paidAt: daysAgo(45),
-    userId: kyochan.id,
-  },
-  {
-    title: "カラオケ",
-    emoji: "🎤",
-    totalAmount: 6300,
-    paidAt: daysAgo(42),
-    userId: scooter.id,
-  },
-  {
-    title: "食器用洗剤",
-    emoji: "🧽",
-    totalAmount: 450,
-    paidAt: daysAgo(38),
-    userId: kaede.id,
-  },
-  {
-    title: "みんなで鍋",
-    emoji: "🍲",
-    totalAmount: 5400,
-    paidAt: daysAgo(35),
-    userId: nanako.id,
-  },
-  {
-    title: "キッチンペーパー",
-    emoji: "🧻",
-    totalAmount: 680,
-    paidAt: daysAgo(31),
-    userId: kouga.id,
-  },
-  {
-    title: "ラーメン屋",
-    emoji: "🍜",
-    totalAmount: 4200,
-    paidAt: daysAgo(28),
-    userId: kyochan.id,
-  },
-  {
-    title: "ゴミ袋",
-    emoji: "🗑️",
-    totalAmount: 580,
-    paidAt: daysAgo(24),
-    userId: scooter.id,
-  },
-  {
-    title: "お好み焼き",
-    emoji: "🥞",
-    totalAmount: 3800,
-    paidAt: daysAgo(21),
-    userId: kaede.id,
-  },
-  {
-    title: "ハンドソープ",
-    emoji: "🧴",
-    totalAmount: 320,
-    paidAt: daysAgo(18),
-    userId: nanako.id,
-  },
-  {
-    title: "映画館",
-    emoji: "🎬",
-    totalAmount: 7500,
-    paidAt: daysAgo(14),
-    userId: kouga.id,
-  },
-];
-
-const insertedExpenses = await db
-  .insert(schema.expensesTable)
-  .values(expenses.map((expense) => ({ ...expense, groupId: all.id })))
-  .returning();
-
 // Helper to get random subset of users
 const getRandomParticipants = (
   allUsers: typeof users,
@@ -221,13 +114,219 @@ const getRandomParticipants = (
   return shuffled.slice(0, count);
 };
 
-insertedExpenses.forEach(async (expense, index) => {
-  // First few expenses have everyone, then mix it up
-  const participants = index < 3 ? users : getRandomParticipants(users);
-  const randomParticipantIndex = Math.floor(
-    Math.random() * participants.length
-  );
-  const creditor = participants[randomParticipantIndex];
+// Helper to get random user from array
+const getRandomUser = (userArray: typeof users) => {
+  return userArray[Math.floor(Math.random() * userArray.length)];
+};
+
+// Define group members
+const allGroupMembers = users; // All 5 users
+const dubaiGroupMembers = [kouga, kaede, kyochan];
+const shizuokaGroupMembers = [kouga, nanako, scooter, kaede];
+
+// Create expenses for みんな group (7 expenses - equal split)
+const allGroupExpenses = [
+  {
+    title: "トイレットペーパー",
+    emoji: "🧻",
+    totalAmount: 980,
+    paidAt: daysAgo(58),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "居酒屋",
+    emoji: "🍺",
+    totalAmount: 8500,
+    paidAt: daysAgo(52),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "シャンプー・リンス",
+    emoji: "🧴",
+    totalAmount: 1580,
+    paidAt: daysAgo(45),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "焼肉",
+    emoji: "🥩",
+    totalAmount: 12000,
+    paidAt: daysAgo(38),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "洗濯洗剤",
+    emoji: "🧺",
+    totalAmount: 780,
+    paidAt: daysAgo(31),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "カラオケ",
+    emoji: "🎤",
+    totalAmount: 6300,
+    paidAt: daysAgo(24),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+  {
+    title: "食器用洗剤",
+    emoji: "🧽",
+    totalAmount: 450,
+    paidAt: daysAgo(18),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
+  },
+];
+
+// Create expenses for Dubai group (7 expenses - equal split)
+const dubaiGroupExpenses = [
+  {
+    title: "飛行機チケット",
+    emoji: "✈️",
+    totalAmount: 120000,
+    paidAt: daysAgo(55),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "ホテル代",
+    emoji: "🏨",
+    totalAmount: 85000,
+    paidAt: daysAgo(48),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "ディナークルーズ",
+    emoji: "🚢",
+    totalAmount: 15000,
+    paidAt: daysAgo(42),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "お土産",
+    emoji: "🎁",
+    totalAmount: 8500,
+    paidAt: daysAgo(35),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "砂漠ツアー",
+    emoji: "🐪",
+    totalAmount: 12000,
+    paidAt: daysAgo(28),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "タクシー代",
+    emoji: "🚕",
+    totalAmount: 3500,
+    paidAt: daysAgo(21),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+  {
+    title: "レストラン",
+    emoji: "🍽️",
+    totalAmount: 9200,
+    paidAt: daysAgo(14),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+  },
+];
+
+// Create expenses for Shizuoka group (6 expenses - equal split)
+const shizuokaGroupExpenses = [
+  {
+    title: "ガソリン代",
+    emoji: "⛽",
+    totalAmount: 8500,
+    paidAt: daysAgo(50),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+  {
+    title: "温泉宿",
+    emoji: "♨️",
+    totalAmount: 32000,
+    paidAt: daysAgo(44),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+  {
+    title: "お茶お土産",
+    emoji: "🍵",
+    totalAmount: 4500,
+    paidAt: daysAgo(37),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+  {
+    title: "海鮮丼",
+    emoji: "🦐",
+    totalAmount: 6400,
+    paidAt: daysAgo(30),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+  {
+    title: "高速道路代",
+    emoji: "🛣️",
+    totalAmount: 5200,
+    paidAt: daysAgo(23),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+  {
+    title: "おでん",
+    emoji: "🍢",
+    totalAmount: 3800,
+    paidAt: daysAgo(16),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+  },
+];
+
+const allExpenses = [
+  ...allGroupExpenses,
+  ...dubaiGroupExpenses,
+  ...shizuokaGroupExpenses,
+];
+
+const insertedExpenses = await db
+  .insert(schema.expensesTable)
+  .values(allExpenses)
+  .returning();
+
+// Create involvements for each expense
+for (const expense of insertedExpenses) {
+  // Determine which group this expense belongs to
+  let groupMembers: typeof users;
+  if (expense.groupId === all.id) {
+    groupMembers = allGroupMembers;
+  } else if (expense.groupId === dubai.id) {
+    groupMembers = dubaiGroupMembers;
+  } else if (expense.groupId === shizuoka.id) {
+    groupMembers = shizuokaGroupMembers;
+  } else {
+    continue;
+  }
+
+  // For the first few expenses, include all group members
+  // Otherwise, randomly select participants
+  const expenseIndex = insertedExpenses.indexOf(expense);
+  const participants =
+    expenseIndex < 3 ? groupMembers : getRandomParticipants(groupMembers);
+
   const participantIds = participants.map((user) => user.id);
   const splits = fairSplit(expense.totalAmount || 0, participantIds);
 
@@ -241,7 +340,7 @@ insertedExpenses.forEach(async (expense, index) => {
       };
     }),
     {
-      userId: creditor.id,
+      userId: expense.userId,
       expenseId: expense.id,
       amount: -expense.totalAmount,
       type: "payment",
@@ -249,76 +348,103 @@ insertedExpenses.forEach(async (expense, index) => {
   ];
 
   await db.insert(schema.involvementsTable).values(values);
-});
+}
 
-const ratioExpenses = [
-  {
-    title: "キッチンスポンジ",
-    emoji: "🧽",
-    totalAmount: 280,
-    paidAt: daysAgo(11),
-    userId: kyochan.id,
-    splitType: "ratio",
-  },
+// Create ratio split expenses (2 for each group = 6 total)
+const allGroupRatioExpenses = [
   {
     title: "寿司",
     emoji: "🍣",
     totalAmount: 9200,
-    paidAt: daysAgo(9),
-    userId: scooter.id,
+    paidAt: daysAgo(11),
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
     splitType: "ratio",
   },
   {
     title: "ティッシュペーパー",
     emoji: "📦",
     totalAmount: 880,
-    paidAt: daysAgo(7),
-    userId: kaede.id,
-    splitType: "ratio",
-  },
-  {
-    title: "温泉",
-    emoji: "♨️",
-    totalAmount: 5000,
     paidAt: daysAgo(5),
-    userId: nanako.id,
-    splitType: "ratio",
-  },
-  {
-    title: "コンビニお菓子",
-    emoji: "🍫",
-    totalAmount: 1200,
-    paidAt: daysAgo(3),
-    userId: kouga.id,
-    splitType: "ratio",
-  },
-  {
-    title: "タピオカ",
-    emoji: "🧋",
-    totalAmount: 2100,
-    paidAt: daysAgo(1),
-    userId: kyochan.id,
+    userId: getRandomUser(allGroupMembers).id,
+    groupId: all.id,
     splitType: "ratio",
   },
 ];
 
+const dubaiGroupRatioExpenses = [
+  {
+    title: "スパ",
+    emoji: "💆",
+    totalAmount: 18000,
+    paidAt: daysAgo(9),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+    splitType: "ratio",
+  },
+  {
+    title: "カフェ",
+    emoji: "☕",
+    totalAmount: 2400,
+    paidAt: daysAgo(3),
+    userId: getRandomUser(dubaiGroupMembers).id,
+    groupId: dubai.id,
+    splitType: "ratio",
+  },
+];
+
+const shizuokaGroupRatioExpenses = [
+  {
+    title: "みかん",
+    emoji: "🍊",
+    totalAmount: 3200,
+    paidAt: daysAgo(7),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+    splitType: "ratio",
+  },
+  {
+    title: "駐車場代",
+    emoji: "🅿️",
+    totalAmount: 1500,
+    paidAt: daysAgo(1),
+    userId: getRandomUser(shizuokaGroupMembers).id,
+    groupId: shizuoka.id,
+    splitType: "ratio",
+  },
+];
+
+const allRatioExpenses = [
+  ...allGroupRatioExpenses,
+  ...dubaiGroupRatioExpenses,
+  ...shizuokaGroupRatioExpenses,
+];
+
 const insertedRatioExpenses = await db
   .insert(schema.expensesTable)
-  .values(
-    ratioExpenses.map((expense) => ({
-      ...expense,
-      groupId: all.id,
-    }))
-  )
+  .values(allRatioExpenses)
   .returning();
 
-insertedRatioExpenses.forEach(async (expense, index) => {
-  // First few expenses have everyone, then mix it up
-  const participants = index < 2 ? users : getRandomParticipants(users);
-  const randomParticipantIndex = Math.floor(
-    Math.random() * participants.length
-  );
-  const creditor = participants[randomParticipantIndex];
+// Create involvements for ratio expenses
+for (const expense of insertedRatioExpenses) {
+  // Determine which group this expense belongs to
+  let groupMembers: typeof users;
+  if (expense.groupId === all.id) {
+    groupMembers = allGroupMembers;
+  } else if (expense.groupId === dubai.id) {
+    groupMembers = dubaiGroupMembers;
+  } else if (expense.groupId === shizuoka.id) {
+    groupMembers = shizuokaGroupMembers;
+  } else {
+    continue;
+  }
+
+  // For the first few expenses, include all group members
+  // Otherwise, randomly select participants
+  const expenseIndex = insertedRatioExpenses.indexOf(expense);
+  const participants =
+    expenseIndex < 2 ? groupMembers : getRandomParticipants(groupMembers);
+
   const ratioMap = new Map(
     participants.map((user) => [user.id, Math.ceil(Math.random() * 4)])
   );
@@ -335,7 +461,7 @@ insertedRatioExpenses.forEach(async (expense, index) => {
       };
     }),
     {
-      userId: creditor.id,
+      userId: expense.userId,
       expenseId: expense.id,
       amount: -expense.totalAmount,
       type: "payment",
@@ -343,5 +469,5 @@ insertedRatioExpenses.forEach(async (expense, index) => {
   ];
 
   await db.insert(schema.involvementsTable).values(values);
-});
+}
 console.log("Seeding complete! ✅");
