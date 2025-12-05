@@ -1,0 +1,1 @@
+ALTER TABLE `expenses` ADD `groupId` integer REFERENCES groups(id);

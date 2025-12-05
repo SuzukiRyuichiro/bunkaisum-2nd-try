@@ -1,5 +1,11 @@
 import { relations, sql, eq, asc, ne } from "drizzle-orm";
-import { int, sqliteTable, sqliteView, text } from "drizzle-orm/sqlite-core";
+import {
+  int,
+  primaryKey,
+  sqliteTable,
+  sqliteView,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 const timestamps = {
   createdAt: int("createdAt", { mode: "timestamp" })
@@ -19,6 +25,7 @@ export const expensesTable = sqliteTable("expenses", {
   emoji: text(),
   paidAt: text("paidAt"), // Store as "YYYY-MM-DD" string
   userId: int("userId").references(() => usersTable.id),
+  groupId: int("groupId").references(() => groupsTable.id),
   splitType: text("splitType").default("equal"),
   ...timestamps,
 });
@@ -51,11 +58,25 @@ export const involvementsTable = sqliteTable("involvements", {
   ...timestamps,
 });
 
+export const groupsTable = sqliteTable("groups", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text("name"),
+  ...timestamps,
+});
+
+export const groupMembersTable = sqliteTable("groupMembers", {
+  id: int().primaryKey({ autoIncrement: true }),
+  userId: int("userId").references(() => usersTable.id),
+  groupId: int("groupId").references(() => groupsTable.id),
+  ...timestamps,
+});
+
 // Relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
   expenses: many(expensesTable),
   oAuthAccounts: many(oAuthAccountsTable),
   involvements: many(involvementsTable),
+  groupMembers: many(groupMembersTable),
 }));
 
 export const expensesRelations = relations(expensesTable, ({ one, many }) => ({
@@ -65,6 +86,24 @@ export const expensesRelations = relations(expensesTable, ({ one, many }) => ({
   }),
   involvements: many(involvementsTable),
 }));
+
+export const groupsRelations = relations(groupsTable, ({ many }) => ({
+  expenses: many(expensesTable),
+  groupMembers: many(groupMembersTable),
+}));
+
+export const groupMembersRelations = relations(groupMembersTable, ({ one }) => {
+  return {
+    group: one(groupsTable, {
+      fields: [groupMembersTable.groupId],
+      references: [groupsTable.id],
+    }),
+    user: one(usersTable, {
+      fields: [groupMembersTable.userId],
+      references: [usersTable.id],
+    }),
+  };
+});
 
 export const oAuthAccountsRelations = relations(
   oAuthAccountsTable,

@@ -134,6 +134,27 @@
       "when": 1764241874750,
       "tag": "0018_striped_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1764833285338,
+      "tag": "0019_rare_peter_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1764834191507,
+      "tag": "0020_silent_beast",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1764836639123,
+      "tag": "0021_sweet_mister_fear",
+      "breakpoints": true
     }
   ]
 }

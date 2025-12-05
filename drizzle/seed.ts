@@ -19,9 +19,25 @@ await db.delete(schema.oAuthAccountsTable);
 await db.delete(schema.involvementsTable);
 await db.delete(schema.expensesTable);
 await db.delete(schema.usersTable);
+await db.delete(schema.groupsTable);
 
 console.log("done cleaning ✅");
 console.log("Seeding users and expenses 🌱");
+
+const [all, dubai, shizuoka] = await db
+  .insert(schema.groupsTable)
+  .values([
+    {
+      name: "みんな",
+    },
+    {
+      name: "ドバイ旅行",
+    },
+    {
+      name: "静岡旅行",
+    },
+  ])
+  .returning();
 
 // Create users
 const users = await db
@@ -54,6 +70,18 @@ const users = await db
   .returning();
 
 const [scooter, kaede, kouga, nanako, kyochan] = users;
+
+const members = await db.insert(schema.groupMembersTable).values([
+  ...users.map((user) => ({ userId: user.id, groupId: all.id })),
+  ...[kouga, kaede, kyochan].map((user) => ({
+    userId: user.id,
+    groupId: dubai.id,
+  })),
+  ...[kouga, nanako, scooter, kaede].map((user) => ({
+    userId: user.id,
+    groupId: shizuoka.id,
+  })),
+]);
 
 // Helper function to get a date N days ago
 const daysAgo = (days: number): string => {
@@ -166,7 +194,7 @@ const expenses = [
 
 const insertedExpenses = await db
   .insert(schema.expensesTable)
-  .values(expenses)
+  .values(expenses.map((expense) => ({ ...expense, groupId: all.id })))
   .returning();
 
 // Helper to get random subset of users
@@ -269,7 +297,7 @@ const ratioExpenses = [
 
 const insertedRatioExpenses = await db
   .insert(schema.expensesTable)
-  .values(ratioExpenses)
+  .values(ratioExpenses.map((expense) => ({ ...expense, groupId: all.id })))
   .returning();
 
 insertedRatioExpenses.forEach(async (expense, index) => {
