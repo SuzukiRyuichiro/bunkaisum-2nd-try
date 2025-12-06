@@ -22,7 +22,11 @@
       </template>
 
       <template #balances>
-        <BalancesTab class="pt-4" />
+        <BalancesTab
+          class="pt-4"
+          :balances="balances"
+          :settlements="settlements"
+        />
       </template>
     </UTabs>
   </div>
@@ -41,6 +45,12 @@ const { data: group } = await useFetch(`/api/groups/${route.params.id}`);
 const { data: expenses } = await useFetch(
   `/api/groups/${route.params.id}/expenses`
 );
+
+const { data } = await useFetch(`/api/groups/${route.params.id}/balances`);
+const { settlements, balances } = data.value || {
+  settlements: [],
+  balances: [],
+};
 
 const items = [
   {
