@@ -19,6 +19,5 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  console.log({ expense });
   return expense;
 });

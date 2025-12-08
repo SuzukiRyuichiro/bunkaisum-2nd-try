@@ -69,6 +69,11 @@
 <script setup lang="ts">
 import BalanceCardList from "@/components/balances/BalanceCardList.vue";
 import Card from "@/components/misc/Card.vue";
+import type { Balance, Settlement } from "~~/server/utils/settlements";
 
-defineProps<{ balances: any; settlements: any; groupId: number }>();
+defineProps<{
+  balances: Balance[];
+  settlements: Settlement[];
+  groupId: number;
+}>();
 </script>

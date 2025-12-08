@@ -1,4 +1,4 @@
-type Balance = {
+export type Balance = {
   userId: number;
   displayName: string | null;
   profilePictureUrl: string | null;

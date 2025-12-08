@@ -9,7 +9,7 @@
       :key="index"
       :to="{
         name: 'groups-groupId-expenses-id',
-        params: { groupId: expense.groupId, id: expense.id },
+        params: { groupId: expense?.groupId, id: expense?.id },
       }"
     />
   </div>
@@ -17,5 +17,5 @@
 
 <script lang="ts" setup>
 import ExpenseCard from "~/components/expenses/ExpenseCard.vue";
-defineProps<{ expenses: any }>();
+defineProps<{ expenses: ExpenseWithUser[] }>();
 </script>

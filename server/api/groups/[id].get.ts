@@ -18,7 +18,12 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  if (!group) throw new Error("Not found");
+  if (!group) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Group not found",
+    });
+  }
 
   return {
     ...group,

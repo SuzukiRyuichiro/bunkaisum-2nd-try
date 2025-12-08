@@ -6,7 +6,12 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle(event);
   const groupId = parseInt(getRouterParam(event, "groupId") || "");
 
-  if (isNaN(groupId)) throw new Error("Invalid Group ID");
+  if (isNaN(groupId)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Group ID invalid",
+    });
+  }
 
   const usersAndGroupMembers = await db
     .select()
