@@ -16,7 +16,9 @@ const route = useRoute();
 
 const handleBack = () => {
   // Check if page defines a custom back route in meta
-  const backTo = route.meta.backTo as string | undefined;
+  const backTo = (route.meta.backTo || route.query.backTo) as
+    | string
+    | undefined;
 
   if (backTo) {
     router.push(backTo);

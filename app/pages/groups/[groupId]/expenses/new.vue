@@ -520,14 +520,20 @@ const handleFormSubmit = async (event: FormSubmitEvent<ExpenseSchema>) => {
     ),
   };
 
-  const response = await $fetch("/api/expenses", {
-    method: "POST",
-    body: payload,
-  });
+  const response = await $fetch(
+    `/api/groups/${route.params.groupId}/expenses`,
+    {
+      method: "POST",
+      body: payload,
+    }
+  );
   // On success, redirect the user to the show page
 
   if (response.success) {
-    navigateTo(`/expenses/${response.id}`);
+    navigateTo({
+      path: `/groups/${route.params.groupId}/expenses/${response.id}`,
+      query: { backTo: `/groups/${route.params.groupId}` },
+    });
   }
 };
 

@@ -88,12 +88,13 @@
 </template>
 
 <script lang="ts" setup>
+import Card from "~~/app/components/misc/Card.vue";
+const route = useRoute();
+
 definePageMeta({
   layout: "back",
 });
-import Card from "~~/app/components/misc/Card.vue";
 
-const route = useRoute();
-
+// TODO: I couldn't figure out how to make nested routes in the API side
 const { data: expense } = await useFetch(`/api/expenses/${route.params.id}`);
 </script>

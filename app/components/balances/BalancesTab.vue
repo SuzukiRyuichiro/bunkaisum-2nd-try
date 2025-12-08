@@ -45,7 +45,7 @@
               icon="i-lucide-check"
               class="w-full justify-center mt-2"
               :to="{
-                path: '/expenses/new',
+                path: `/groups/${groupId}/expenses/new`,
                 query: {
                   totalAmount: settlement.amount,
                   userId: settlement.from.userId,
@@ -70,5 +70,5 @@
 import BalanceCardList from "@/components/balances/BalanceCardList.vue";
 import Card from "@/components/misc/Card.vue";
 
-defineProps<{ balances: any; settlements: any }>();
+defineProps<{ balances: any; settlements: any; groupId: number }>();
 </script>

@@ -23,6 +23,7 @@
 
       <template #balances>
         <BalancesTab
+          :group-id="parseInt(route.params.id)"
           class="pt-4"
           :balances="balances"
           :settlements="settlements"
