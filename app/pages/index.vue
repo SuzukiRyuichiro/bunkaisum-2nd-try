@@ -12,6 +12,14 @@
     </div>
 
     <GroupCardList :groups="groups" />
+
+    <UButton
+      class="w-full flex justify-center mt-4"
+      icon="i-lucide-plus"
+      size="lg"
+      to="/groups/new"
+      >新しいグループを作る</UButton
+    >
   </div>
 </template>
 
