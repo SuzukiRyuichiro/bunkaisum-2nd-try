@@ -40,5 +40,6 @@
 
 <script setup lang="ts">
 import Card from "@/components/misc/Card.vue";
-defineProps<{ balances: any[] }>();
+import type { Balance } from "~~/server/utils/settlements";
+defineProps<{ balances: Balance[] }>();
 </script>

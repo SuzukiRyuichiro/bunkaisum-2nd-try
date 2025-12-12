@@ -2,17 +2,27 @@ import { expensesTable, involvementsTable } from "~~/server/db/schema";
 import useDrizzle from "~~/server/utils/drizzle";
 
 export default defineEventHandler(async (event) => {
-  // Here I wanna use Drizzle
   const db = useDrizzle(event);
+  const groupId = getRouterParam(event, "groupId");
+
+  if (!groupId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Group ID is required",
+    });
+  }
+
   const { expense, involvements } = await readBody(event);
   const { user } = await requireUserSession(event);
 
-  // // Insert expense
-  // // Insert multiple involvements
-
+  // Insert expense with groupId
   const [newExpense] = await db
     .insert(expensesTable)
-    .values({ userId: user.id, ...expense })
+    .values({
+      userId: user.id,
+      groupId: parseInt(groupId),
+      ...expense
+    })
     .returning();
 
   const newInvolvements = await db.insert(involvementsTable).values(
@@ -22,7 +32,6 @@ export default defineEventHandler(async (event) => {
     }))
   );
 
-  // return newExpense;
   return {
     success: true,
     id: newExpense.id,

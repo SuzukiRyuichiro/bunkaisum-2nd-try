@@ -10,7 +10,7 @@
       </template>
       <template #body>
         <div class="grid gap-4 px-8 py-4">
-          <Card v-for="settlement in data?.settlements || []">
+          <Card v-for="settlement in settlements || []">
             <div class="grid grid-cols-[1fr_1rem_1fr] items-center">
               <div class="flex items-center gap-4">
                 <UAvatar
@@ -45,7 +45,7 @@
               icon="i-lucide-check"
               class="w-full justify-center mt-2"
               :to="{
-                path: '/expenses/new',
+                path: `/groups/${groupId}/expenses/new`,
                 query: {
                   totalAmount: settlement.amount,
                   userId: settlement.from.userId,
@@ -62,12 +62,18 @@
       </template>
     </UModal>
 
-    <BalanceCardList :balances="data?.balances || []" />
+    <BalanceCardList :balances="balances || []" />
   </div>
 </template>
 
 <script setup lang="ts">
 import BalanceCardList from "@/components/balances/BalanceCardList.vue";
 import Card from "@/components/misc/Card.vue";
-const { status, data } = await useFetch("/api/balances");
+import type { Balance, Settlement } from "~~/server/utils/settlements";
+
+defineProps<{
+  balances: Balance[];
+  settlements: Settlement[];
+  groupId: number;
+}>();
 </script>

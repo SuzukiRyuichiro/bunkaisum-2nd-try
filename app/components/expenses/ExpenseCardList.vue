@@ -7,13 +7,15 @@
       v-for="(expense, index) in expenses"
       :expense="expense"
       :key="index"
-      :to="{ name: 'expenses-id', params: { id: expense.id } }"
+      :to="{
+        name: 'groups-groupId-expenses-id',
+        params: { groupId: expense?.groupId, id: expense?.id },
+      }"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import ExpenseCard from "./ExpenseCard.vue";
-
-const { status, data: expenses } = await useFetch("/api/expenses");
+import ExpenseCard from "~/components/expenses/ExpenseCard.vue";
+defineProps<{ expenses: ExpenseWithUser[] }>();
 </script>

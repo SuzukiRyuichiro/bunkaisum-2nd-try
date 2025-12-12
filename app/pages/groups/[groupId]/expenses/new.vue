@@ -237,10 +237,12 @@ import type { CalendarDate } from "@internationalized/date";
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
-const { data: users } = await useFetch("/api/users");
+const route = useRoute();
+const { data: users } = await useFetch(
+  `/api/groups/${route.params.groupId}/users`
+);
 
 // Get query parameters from route
-const route = useRoute();
 const queryParams = route.query;
 
 // Parse query parameters for form initialization
@@ -518,14 +520,20 @@ const handleFormSubmit = async (event: FormSubmitEvent<ExpenseSchema>) => {
     ),
   };
 
-  const response = await $fetch("/api/expenses", {
-    method: "POST",
-    body: payload,
-  });
+  const response = await $fetch(
+    `/api/groups/${route.params.groupId}/expenses`,
+    {
+      method: "POST",
+      body: payload,
+    }
+  );
   // On success, redirect the user to the show page
 
   if (response.success) {
-    navigateTo(`/expenses/${response.id}`);
+    navigateTo({
+      path: `/groups/${route.params.groupId}/expenses/${response.id}`,
+      query: { backTo: `/groups/${route.params.groupId}` },
+    });
   }
 };
 

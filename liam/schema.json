@@ -107,6 +107,11 @@
           "type": "INTEGER",
           "nullable": false,
           "default": "unixepoch()"
+        },
+        {
+          "name": "profilePictureUrl",
+          "type": "TEXT",
+          "nullable": true
         }
       ],
       "constraints": [
@@ -120,7 +125,7 @@
           ]
         }
       ],
-      "def": "CREATE TABLE `users` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`displayName` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n)"
+      "def": "CREATE TABLE `users` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`displayName` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n, `profilePictureUrl` text)"
     },
     {
       "name": "oAuthAccounts",
@@ -252,6 +257,11 @@
           "type": "TEXT",
           "nullable": true,
           "default": "'equal'"
+        },
+        {
+          "name": "groupId",
+          "type": "INTEGER",
+          "nullable": true
         }
       ],
       "constraints": [
@@ -276,9 +286,22 @@
           "referenced_columns": [
             "id"
           ]
+        },
+        {
+          "name": "- (Foreign key ID: 1)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (groupId) REFERENCES groups (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "expenses",
+          "referenced_table": "groups",
+          "columns": [
+            "groupId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
         }
       ],
-      "def": "CREATE TABLE \"expenses\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`title` text,\n\t`totalAmount` integer DEFAULT 0,\n\t`paidAt` text,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL, `emoji` text, `splitType` text DEFAULT 'equal',\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
+      "def": "CREATE TABLE \"expenses\" (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`title` text,\n\t`totalAmount` integer DEFAULT 0,\n\t`paidAt` text,\n\t`userId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL, `emoji` text, `splitType` text DEFAULT 'equal', `groupId` integer REFERENCES groups(id),\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
     },
     {
       "name": "__drizzle_migrations",
@@ -417,6 +440,153 @@
         }
       ],
       "def": "CREATE TABLE `involvements` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`userId` integer,\n\t`expenseId` integer,\n\t`amount` integer NOT NULL,\n\t`type` text NOT NULL,\n\t`shareRatio` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`expenseId`) REFERENCES `expenses`(`id`) ON UPDATE no action ON DELETE no action\n)"
+    },
+    {
+      "name": "balanceView",
+      "type": "view",
+      "columns": [
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "displayName",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "profilePictureUrl",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "netBalance",
+          "type": "",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "",
+          "nullable": true
+        }
+      ],
+      "def": "CREATE VIEW `balanceView` AS select \"involvements\".\"userId\", \"users\".\"displayName\", \"users\".\"profilePictureUrl\", SUM(\"involvements\".\"amount\") as \"netBalance\", \n      CASE\n        WHEN SUM(\"involvements\".\"amount\") \u003c 0 THEN 'creditor'\n        WHEN SUM(\"involvements\".\"amount\") \u003e= 0 THEN 'debtor'\n      END\n     as \"status\" from \"involvements\" inner join \"users\" on \"involvements\".\"userId\" = \"users\".\"id\" group by \"involvements\".\"userId\", \"users\".\"displayName\" having SUM(\"involvements\".\"amount\") \u003c\u003e 0 order by \"netBalance\" asc",
+      "referenced_tables": [
+        "\"involvements\"",
+        "\"users\""
+      ]
+    },
+    {
+      "name": "groups",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "groups",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE `groups` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`name` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n)"
+    },
+    {
+      "name": "groupMembers",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "groupId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "groupMembers",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (groupId) REFERENCES groups (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "groupMembers",
+          "referenced_table": "groups",
+          "columns": [
+            "groupId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 1)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "groupMembers",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE `groupMembers` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`userId` integer,\n\t`groupId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`groupId`) REFERENCES `groups`(`id`) ON UPDATE no action ON DELETE no action\n)"
     }
   ],
   "relations": [
@@ -447,6 +617,19 @@
       "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
     },
     {
+      "table": "expenses",
+      "columns": [
+        "groupId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "groups",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (groupId) REFERENCES groups (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
       "table": "involvements",
       "columns": [
         "expenseId"
@@ -461,6 +644,32 @@
     },
     {
       "table": "involvements",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "groupMembers",
+      "columns": [
+        "groupId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "groups",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (groupId) REFERENCES groups (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "groupMembers",
       "columns": [
         "userId"
       ],
