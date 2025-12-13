@@ -647,6 +647,8 @@ const currencyFormState = ref<Partial<CurrencySchema>>({
 const currencyModalOpen = ref<boolean>(false);
 
 const convertCurrency = async () => {
+  if (!formState.value.paidAt) return;
+
   if (
     currencyFormState.value.currency == undefined ||
     !currencies.value.includes(currencyFormState.value.currency) ||
