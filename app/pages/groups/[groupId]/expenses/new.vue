@@ -642,7 +642,6 @@ const currencySchema = z.object({
 type CurrencySchema = z.output<typeof currencySchema>;
 const currencyFormState = ref<Partial<CurrencySchema>>({
   totalAmountInCurrency: 0,
-  currency: "",
 });
 
 const currencyModalOpen = ref<boolean>(false);
@@ -664,20 +663,35 @@ const convertCurrency = async () => {
   type CurrencyResponse = {
     date: string;
   } & Record<string, Record<string, number>>;
-  const { data } = await useFetch<CurrencyResponse>(url);
 
-  if (!data.value) return;
+  try {
+    const { data, error } = await useFetch<CurrencyResponse>(url);
 
-  const toJpy = data.value[currencyFormState.value.currency.toLowerCase()]?.jpy;
+    if (error.value) {
+      console.error("Currency API error:", error.value);
+      return;
+    }
 
-  if (!toJpy) return;
+    if (!data.value) {
+      console.error("No data returned from currency API");
+      return;
+    }
 
-  // apply the total in JPY in the actual formState
-  formState.value.totalAmount = Math.round(
-    toJpy * currencyFormState.value.totalAmountInCurrency
-  );
+    const toJpy =
+      data.value[currencyFormState.value.currency.toLowerCase()]?.jpy;
 
-  // close the modal
-  currencyModalOpen.value = false;
+    if (!toJpy) {
+      console.error("JPY conversion rate not found");
+      return;
+    }
+
+    formState.value.totalAmount = Math.round(
+      toJpy * currencyFormState.value.totalAmountInCurrency
+    );
+
+    currencyModalOpen.value = false;
+  } catch (err) {
+    console.error("Currency conversion failed:", err);
+  }
 };
 </script>
