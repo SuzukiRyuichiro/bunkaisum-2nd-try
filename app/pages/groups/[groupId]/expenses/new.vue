@@ -64,7 +64,12 @@
           :ui="{ label: 'flex w-full justify-between align-center' }"
         >
           <template #label>
-            <h3 class="h-auto">合計額</h3>
+            <div class="flex gap-2">
+              <h3 class="h-auto">合計額</h3>
+              <p v-if="conversionMath" class="text-muted">
+                ({{ conversionMath }})
+              </p>
+            </div>
             <UModal title="外貨で登録する" v-model:open="currencyModalOpen">
               <UButton size="sm" icon="roentgen:exchange-dollar-pound">
                 外貨
@@ -636,7 +641,7 @@ const currencies = ref(["USD", "GBP", "AED", "CNY"]);
 
 const currencySchema = z.object({
   totalAmountInCurrency: z.int().min(1, "1以上の値を入力してください"),
-  currency: z.enum(currencies.value),
+  currency: z.enum(["USD", "GBP", "AED", "CNY"] as const),
 });
 
 type CurrencySchema = z.output<typeof currencySchema>;
@@ -661,10 +666,15 @@ const convertCurrency = async () => {
   const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
     formState.value.paidAt
   }/v1/currencies/${currencyFormState.value.currency.toLowerCase()}.json`;
-  // convert the total amount to JPY
+
   type CurrencyResponse = {
     date: string;
-  } & Record<string, Record<string, number>>;
+    [currencyCode: string]:
+      | {
+          [targetCurrency: string]: number;
+        }
+      | string;
+  };
 
   try {
     const { data, error } = await useFetch<CurrencyResponse>(url);
@@ -691,9 +701,15 @@ const convertCurrency = async () => {
       toJpy * currencyFormState.value.totalAmountInCurrency
     );
 
+    conversionMath.value = `${currencyFormState.value.totalAmountInCurrency} ${
+      currencyFormState.value.currency
+    } * ¥${toJpy.toFixed(2)}`;
+
     currencyModalOpen.value = false;
   } catch (err) {
     console.error("Currency conversion failed:", err);
   }
 };
+
+const conversionMath = ref();
 </script>
