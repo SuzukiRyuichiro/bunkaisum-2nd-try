@@ -39,8 +39,70 @@
           />
         </UFormField>
       </Card>
+
       <Card>
-        <UFormField label="合計額" name="totalAmount">
+        <UFormField label="支払った日" name="paidAt">
+          <UPopover>
+            <UButton
+              color="neutral"
+              variant="soft"
+              icon="i-lucide-calendar"
+              class="w-full"
+            >
+              {{ formState.paidAt ? formState.paidAt : "Select a date" }}
+            </UButton>
+
+            <template #content>
+              <UCalendar v-model="calendarDate" class="p-2" />
+            </template>
+          </UPopover>
+        </UFormField>
+      </Card>
+      <Card>
+        <UFormField
+          name="totalAmount"
+          :ui="{ label: 'flex w-full justify-between align-center' }"
+        >
+          <template #label>
+            <h3 class="h-auto">合計額</h3>
+            <UModal title="外貨で登録する" v-model:open="currencyModalOpen">
+              <UButton size="sm" icon="roentgen:exchange-dollar-pound">
+                外貨
+              </UButton>
+              <template #body>
+                <UForm @submit="convertCurrency" class="grid gap-4">
+                  <UFormField name="amount" label="外貨での合計額">
+                    <UInputNumber
+                      v-model="currencyFormState.totalAmountInCurrency"
+                      class="w-full"
+                      :min="0"
+                      orientation="vertical"
+                      size="lg"
+                    />
+                  </UFormField>
+                  <UFormField name="currency" label="通貨">
+                    <USelectMenu
+                      class="w-full"
+                      v-model="currencyFormState.currency"
+                      :items="currencies"
+                    />
+                  </UFormField>
+                  <UButton
+                    loading-auto
+                    :leading="false"
+                    :ui="{ base: 'justify-center' }"
+                    type="submit"
+                    :disabled="
+                      currencyFormState.currency == undefined ||
+                      !currencies.includes(currencyFormState.currency) ||
+                      currencyFormState.totalAmountInCurrency === 0
+                    "
+                    >完了</UButton
+                  >
+                </UForm>
+              </template>
+            </UModal>
+          </template>
           <UInputNumber
             class="w-full"
             variant="soft"
@@ -71,24 +133,6 @@
         </UFormField>
       </Card>
 
-      <Card>
-        <UFormField label="支払った日" name="paidAt">
-          <UPopover>
-            <UButton
-              color="neutral"
-              variant="soft"
-              icon="i-lucide-calendar"
-              class="w-full"
-            >
-              {{ formState.paidAt ? formState.paidAt : "Select a date" }}
-            </UButton>
-
-            <template #content>
-              <UCalendar v-model="calendarDate" class="p-2" />
-            </template>
-          </UPopover>
-        </UFormField>
-      </Card>
       <Card>
         <UFormField label="参加者" name="participantIds">
           <UCheckboxGroup
@@ -586,5 +630,54 @@ const suggestEmoji = async () => {
   if (emoji) {
     formState.value.emoji = emoji;
   }
+};
+
+const currencies = ref(["USD", "GBP", "AED", "CNY"]);
+
+const currencySchema = z.object({
+  totalAmountInCurrency: z.int().min(1, "1以上の値を入力してください"),
+  currency: z.enum(currencies.value),
+});
+
+type CurrencySchema = z.output<typeof currencySchema>;
+const currencyFormState = ref<Partial<CurrencySchema>>({
+  totalAmountInCurrency: 0,
+  currency: "",
+});
+
+const currencyModalOpen = ref<boolean>(false);
+
+const convertCurrency = async () => {
+  if (
+    currencyFormState.value.currency == undefined ||
+    !currencies.value.includes(currencyFormState.value.currency) ||
+    currencyFormState.value.totalAmountInCurrency === 0 ||
+    currencyFormState.value.totalAmountInCurrency == undefined
+  )
+    return;
+
+  // get currency conversion for the selected currency to JPY
+  const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
+    formState.value.paidAt
+  }/v1/currencies/${currencyFormState.value.currency.toLowerCase()}.json`;
+  // convert the total amount to JPY
+  type CurrencyResponse = {
+    date: string;
+  } & Record<string, Record<string, number>>;
+  const { data } = await useFetch<CurrencyResponse>(url);
+
+  if (!data.value) return;
+
+  const toJpy = data.value[currencyFormState.value.currency.toLowerCase()]?.jpy;
+
+  if (!toJpy) return;
+
+  // apply the total in JPY in the actual formState
+  formState.value.totalAmount = Math.round(
+    toJpy * currencyFormState.value.totalAmountInCurrency
+  );
+
+  // close the modal
+  currencyModalOpen.value = false;
 };
 </script>
