@@ -82,7 +82,10 @@
                       class="w-full"
                       :min="0"
                       orientation="vertical"
-                      size="lg"
+                      :step="0.01"
+                      :format-options="{
+                        maximumFractionDigits: 2,
+                      }"
                     />
                   </UFormField>
                   <UFormField name="currency" label="通貨">
