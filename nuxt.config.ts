@@ -69,7 +69,7 @@ export default defineNuxtConfig({
           sizes: "846x1598",
           type: "image/png",
           form_factor: "narrow",
-          label: "Groups page",
+          label: "Expenses page",
         },
       ],
     },
