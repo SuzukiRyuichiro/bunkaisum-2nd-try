@@ -92,5 +92,6 @@ export default defineNuxtConfig({
     "/login": { prerender: true },
     "/about": { prerender: true },
     "/groups": { swr: true },
+    "/groups/*": { swr: true },
   },
 });
