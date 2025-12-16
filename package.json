@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
+    "@vite-pwa/nuxt": "^1.1.0",
     "drizzle-kit": "^0.31.7",
     "nitro-cloudflare-dev": "^0.2.2",
     "tsx": "^4.20.6",
