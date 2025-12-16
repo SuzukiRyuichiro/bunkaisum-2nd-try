@@ -71,9 +71,4 @@ export default defineNuxtConfig({
       type: "module",
     },
   },
-  vite: {
-    server: {
-      allowedHosts: ["shaky-horses-listen.loca.lt"],
-    },
-  },
 });
