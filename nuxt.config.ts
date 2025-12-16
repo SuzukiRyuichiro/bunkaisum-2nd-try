@@ -41,6 +41,7 @@ export default defineNuxtConfig({
       background_color: "#ffffff",
       display: "standalone",
       start_url: "/",
+      id: "/",
       icons: [
         {
           src: "android/android-launchericon-192-192.png",
@@ -53,6 +54,22 @@ export default defineNuxtConfig({
           sizes: "512x512",
           type: "image/png",
           purpose: "any maskable",
+        },
+      ],
+      screenshots: [
+        {
+          src: "screenshots/groups.png",
+          sizes: "846x808",
+          type: "image/png",
+          form_factor: "wide",
+          label: "Groups page",
+        },
+        {
+          src: "screenshots/expenses.png",
+          sizes: "846x1598",
+          type: "image/png",
+          form_factor: "narrow",
+          label: "Groups page",
         },
       ],
     },
