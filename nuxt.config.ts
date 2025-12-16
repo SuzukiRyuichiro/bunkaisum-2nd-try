@@ -88,4 +88,9 @@ export default defineNuxtConfig({
       type: "module",
     },
   },
+  routeRules: {
+    "/login": { prerender: true },
+    "/about": { prerender: true },
+    "/groups": { swr: true },
+  },
 });
