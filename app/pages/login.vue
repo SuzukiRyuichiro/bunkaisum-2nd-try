@@ -1,9 +1,9 @@
 <template>
   <div class="h-screen grid place-items-center">
     <AuthState v-slot="{ loggedIn, clear }">
-      <div v-if="loggedIn">
-        <UButton @click="clear">Logout</UButton>
-        <UButton to="/">Go home</UButton>
+      <div v-if="loggedIn" class="grid gap-2">
+        <UButton class="justify-center" @click="clear">Logout</UButton>
+        <UButton class="justify-center" to="/">Go home</UButton>
       </div>
       <UButton
         v-else
