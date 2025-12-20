@@ -91,6 +91,7 @@
                   <UFormField name="currency" label="通貨">
                     <USelectMenu
                       class="w-full"
+                      value-key="value"
                       v-model="currencyFormState.currency"
                       :items="currencies"
                     />
@@ -102,7 +103,9 @@
                     type="submit"
                     :disabled="
                       currencyFormState.currency == undefined ||
-                      !currencies.includes(currencyFormState.currency) ||
+                      !currencies
+                        .map((currency) => currency.value)
+                        .includes(currencyFormState.currency) ||
                       currencyFormState.totalAmountInCurrency === 0
                     "
                     >完了</UButton
@@ -639,11 +642,17 @@ const suggestEmoji = async () => {
   }
 };
 
-const currencies = ref(["USD", "GBP", "AED", "CNY"]);
+const currencies = ref([
+  { value: "USD", label: "🇺🇸 USD" },
+  { value: "GBP", label: "🇬🇧 GBP" },
+  { value: "EUR", label: "🇪🇺 EUR" },
+  { value: "AED", label: "🇦🇪 AED" },
+  { value: "CNY", label: "🇨🇳 CNY" },
+]);
 
 const currencySchema = z.object({
   totalAmountInCurrency: z.int().min(1, "1以上の値を入力してください"),
-  currency: z.enum(["USD", "GBP", "AED", "CNY"] as const),
+  currency: z.enum(currencies.value.map((currency) => currency.value)),
 });
 
 type CurrencySchema = z.output<typeof currencySchema>;
@@ -658,7 +667,9 @@ const convertCurrency = async () => {
 
   if (
     currencyFormState.value.currency == undefined ||
-    !currencies.value.includes(currencyFormState.value.currency) ||
+    !currencies.value
+      .map((currency) => currency.value)
+      .includes(currencyFormState.value.currency) ||
     currencyFormState.value.totalAmountInCurrency === 0 ||
     currencyFormState.value.totalAmountInCurrency == undefined
   )
