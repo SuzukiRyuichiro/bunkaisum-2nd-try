@@ -11,7 +11,10 @@
         <div class="flex-1 min-w-0">
           <div class="text-slate-900">{{ expense?.title }}</div>
           <div class="text-sm text-slate-600 mt-0.5">
-            {{ expense?.user?.displayName }}が支払い
+            {{
+              expense?.involvements?.find((inv) => inv.type === "payment")?.user
+                ?.displayName
+            }}が支払い
             {{ expense?.paidAt }}
           </div>
         </div>

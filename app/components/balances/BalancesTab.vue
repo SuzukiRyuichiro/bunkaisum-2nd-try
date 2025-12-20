@@ -48,7 +48,7 @@
                 path: `/groups/${groupId}/expenses/new`,
                 query: {
                   totalAmount: settlement.amount,
-                  userId: settlement.from.userId,
+                  payerId: settlement.from.userId,
                   creditorId: settlement.to.userId,
                   title: `${settlement.from.displayName}から${settlement.to.displayName}の支払い`,
                   emoji: '💸',

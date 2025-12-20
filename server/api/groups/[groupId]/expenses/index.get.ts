@@ -17,6 +17,11 @@ export default defineEventHandler(async (event) => {
     where: (_, { eq }) => eq(expensesTable.groupId, groupId),
     with: {
       user: true,
+      involvements: {
+        with: {
+          user: true,
+        },
+      },
     },
     orderBy: (expensesTable, { desc }) => [desc(expensesTable.createdAt)],
     extras: {

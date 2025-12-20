@@ -128,13 +128,13 @@
       </Card>
 
       <Card>
-        <UFormField label="支払った人" name="userId">
+        <UFormField label="支払った人" name="payerId">
           <USelect
             placeholder="一人選んでください"
             size="lg"
             variant="soft"
             class="w-full"
-            v-model="formState.userId"
+            v-model="formState.payerId"
             value-key="id"
             :items="users.map((u) => ({ id: u.id, label: u.displayName }))"
           />
@@ -301,8 +301,8 @@ const queryParams = route.query;
 const initialTotalAmount = queryParams.totalAmount
   ? Number(queryParams.totalAmount)
   : 0;
-const initialUserId = queryParams.userId
-  ? Number(queryParams.userId)
+const initialPayerId = queryParams.payerId
+  ? Number(queryParams.payerId)
   : undefined;
 const initialCreditorId = queryParams.creditorId
   ? Number(queryParams.creditorId)
@@ -320,7 +320,7 @@ const formState = ref<Partial<ExpenseSchema>>({
   totalAmount: initialTotalAmount,
   emoji: initialEmoji,
   title: initialTitle,
-  userId: initialUserId,
+  payerId: initialPayerId,
   participantIds: initialParticipantIds,
   splitType: initialSplitType,
   paidAt: today(getLocalTimeZone()).toString(),
@@ -452,8 +452,8 @@ const involvements = computed(() => {
         shareRatio: null,
       })) || []),
       {
-        userId: formState.value.userId,
-        user: users.value?.find((user) => user.id === formState.value.userId),
+        userId: formState.value.payerId,
+        user: users.value?.find((user) => user.id === formState.value.payerId),
         type: "payment",
         amount: -formState.value.totalAmount,
         shareRatio: null,
@@ -470,8 +470,8 @@ const involvements = computed(() => {
         shareRatio: splitRatio.value.get(id),
       })) || []),
       {
-        userId: formState.value.userId,
-        user: users.value?.find((user) => user.id === formState.value.userId),
+        userId: formState.value.payerId,
+        user: users.value?.find((user) => user.id === formState.value.payerId),
         type: "payment",
         amount: -formState.value.totalAmount,
         shareRatio: null,
@@ -488,8 +488,8 @@ const involvements = computed(() => {
         shareRatio: null,
       })) || []),
       {
-        userId: formState.value.userId,
-        user: users.value?.find((user) => user.id === formState.value.userId),
+        userId: formState.value.payerId,
+        user: users.value?.find((user) => user.id === formState.value.payerId),
         type: "payment",
         amount: -formState.value.totalAmount,
         shareRatio: null,
@@ -510,7 +510,7 @@ const expenseSchema = z.object({
   title: z.string().min(1, "件名を入力してください"),
   emoji: z.emoji("絵文字をえらんでください"),
   totalAmount: z.int().min(1, "1円以上の金額を入力してください"),
-  userId: z.int("支払った人を選んでください"),
+  payerId: z.int("支払った人を選んでください"),
   paidAt: z.preprocess((val: CalendarDate) => {
     return val.toString();
   }, z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
@@ -559,7 +559,6 @@ const handleFormSubmit = async (event: FormSubmitEvent<ExpenseSchema>) => {
       totalAmount: formState.value.totalAmount,
       emoji: formState.value.emoji,
       paidAt: formState.value.paidAt,
-      userId: formState.value.userId,
       splitType: formState.value.splitType,
     },
     involvements: involvements.value.map(

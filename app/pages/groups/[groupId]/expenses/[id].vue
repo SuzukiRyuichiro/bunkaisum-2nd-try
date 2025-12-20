@@ -20,15 +20,23 @@
         <div class="grow flex gap-4">
           <UAvatar
             :src="
-              expense?.user?.profilePictureUrl
-                ? expense?.user?.profilePictureUrl
+              expense?.involvements.find(
+                (involvement) => involvement.type == 'payment'
+              )?.user?.profilePictureUrl
+                ? expense?.involvements.find(
+                    (involvement) => involvement.type == 'payment'
+                  )?.user?.profilePictureUrl
                 : 'https://github.com/benjamincanac.png'
             "
             size="2xl"
           />
           <div>
             <h3 class="" font-semibold>
-              {{ expense?.user?.displayName }}
+              {{
+                expense?.involvements.find(
+                  (involvement) => involvement.type == "payment"
+                )?.user?.displayName
+              }}
             </h3>
             <p class="text-xs">が全額払いました</p>
           </div>
@@ -83,6 +91,18 @@
           <span class="font-semibold">¥{{ involvement.amount }}</span>
         </div>
       </div>
+    </Card>
+    <Card>
+      <template v-slot:tag>
+        <p class="mt-3">備考</p>
+      </template>
+      <p class="text-slate-600">
+        {{ expense?.user?.displayName }} が
+        {{
+          new Intl.DateTimeFormat("ja-JP").format(new Date(expense?.createdAt))
+        }}
+        に記録しました
+      </p>
     </Card>
   </div>
 </template>
