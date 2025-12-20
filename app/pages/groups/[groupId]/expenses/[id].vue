@@ -99,7 +99,10 @@
       <p class="text-slate-600">
         {{ expense?.user?.displayName }} が
         {{
-          new Intl.DateTimeFormat("ja-JP").format(new Date(expense?.createdAt))
+          new Intl.DateTimeFormat("ja-JP", {
+            dateStyle: "full",
+            timeStyle: "medium",
+          }).format(new Date(expense?.createdAt))
         }}
         に記録しました
       </p>
