@@ -1,7 +1,10 @@
 <template>
   <div class="h-screen grid place-items-center">
     <AuthState v-slot="{ loggedIn, clear }">
-      <UButton v-if="loggedIn" @click="clear">Logout</UButton>
+      <div v-if="loggedIn">
+        <UButton @click="clear">Logout</UButton>
+        <UButton to="/">Go home</UButton>
+      </div>
       <UButton
         v-else
         icon="i-simple-icons-line"
