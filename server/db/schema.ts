@@ -1,4 +1,5 @@
 import { relations, sql, eq, asc, ne } from "drizzle-orm";
+import { integer } from "drizzle-orm/gel-core";
 import {
   int,
   primaryKey,
@@ -71,6 +72,14 @@ export const groupMembersTable = sqliteTable("groupMembers", {
   groupId: int("groupId").references(() => groupsTable.id),
   ...timestamps,
 });
+
+export const refreshTokens = sqliteTable("refreshTokens", {
+  id: int().primaryKey({ autoIncrement: true }),
+  userId: int("userId").references(() => usersTable.id),
+  token: text("token").notNull().unique(),
+  expiresAt: int("expiresAt", { mode: "timestamp" }),
+  ...timestamps
+})
 
 // Relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
@@ -153,3 +162,4 @@ export const balanceView = sqliteView("balanceView").as((queryBuilder) =>
     .having(({ netBalance }) => ne(netBalance, 0))
     .orderBy(asc(sql`"netBalance"`))
 );
+
