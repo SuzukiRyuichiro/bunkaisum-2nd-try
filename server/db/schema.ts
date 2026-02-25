@@ -1,5 +1,4 @@
 import { relations, sql, eq, asc, ne } from "drizzle-orm";
-import { integer } from "drizzle-orm/gel-core";
 import {
   int,
   primaryKey,
