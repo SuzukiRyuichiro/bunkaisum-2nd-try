@@ -293,7 +293,7 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
 const route = useRoute();
-const { authApi } = useApi();
+const { authFetch } = useApi();
 const { data: users } = await useAuthFetch(
   `/api/groups/${route.params.groupId}/users`
 );
@@ -575,7 +575,7 @@ const handleFormSubmit = async (event: FormSubmitEvent<ExpenseSchema>) => {
     ),
   };
 
-  const response = await authApi<any>(
+  const response = await authFetch<any>(
     `/api/groups/${route.params.groupId}/expenses`,
     {
       method: "POST",
@@ -633,7 +633,7 @@ const suggestEmoji = async () => {
   // If emoji is already chosen, don't change
   if (formState.value.emoji !== "") return;
 
-  const emoji = await authApi<string>("/api/emojis/suggest", {
+  const emoji = await authFetch<string>("/api/emojis/suggest", {
     method: "POST",
     body: { title: formState.value.title },
   });

@@ -1,12 +1,20 @@
+import type { NitroFetchOptions } from "nitropack";
+
 export const useApi = () => {
   const { accessToken, clearTokens } = useAuth();
   const config = useRuntimeConfig();
 
   /**
-   * A wrapper around $fetch that automatically adds the Authorization header
+   * An authenticated wrapper around $fetch.
+   * Best used for client-side actions like event listeners (@click, @submit).
    */
-  const authApi = async <T>(url: string, options: any = {}): Promise<T> => {
-    const token = accessToken.value || (import.meta.client ? localStorage.getItem("accessToken") : null);
+  const authFetch = async <T>(
+    url: string,
+    options: NitroFetchOptions<any> = {}
+  ): Promise<T> => {
+    const token =
+      accessToken.value ||
+      (import.meta.client ? localStorage.getItem("accessToken") : null);
 
     try {
       return await $fetch<T>(url, {
@@ -15,7 +23,7 @@ export const useApi = () => {
           ...options.headers,
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-      });
+      } as any);
     } catch (error: any) {
       if (error.statusCode === 401) {
         clearTokens();
@@ -26,7 +34,7 @@ export const useApi = () => {
   };
 
   return {
-    authApi,
+    authFetch,
   };
 };
 
@@ -34,13 +42,18 @@ export const useApi = () => {
  * A wrapper around Nuxt's useFetch that automatically adds the Authorization header.
  * Use this in components for reactive data fetching.
  */
-export const useAuthFetch = <T>(url: string | (() => string), options: any = {}) => {
+export const useAuthFetch = <T>(
+  url: string | (() => string),
+  options: any = {}
+) => {
   const { accessToken, logout } = useAuth();
 
   return useFetch<T>(url, {
     ...options,
     headers: computed(() => {
-      const token = accessToken.value || (import.meta.client ? localStorage.getItem("accessToken") : null);
+      const token =
+        accessToken.value ||
+        (import.meta.client ? localStorage.getItem("accessToken") : null);
       return {
         ...options.headers,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
