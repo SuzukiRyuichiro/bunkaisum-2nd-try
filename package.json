@@ -5,18 +5,20 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "TAURI_BUILD=1 nuxt generate",
     "preview": "nuxt preview",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "postinstall": "nuxt prepare",
-    "deploy": "nuxt build && npx wrangler --cwd .output deploy",
-    "drizzle:generate": "npx drizzle-kit generate",
-    "drizzle:migrate": "npx drizzle-kit migrate",
-    "drizzle:migrate:local": "npx wrangler d1 migrations apply worker-test",
-    "drizzle:studio": "npx drizzle-kit studio",
-    "drizzle:studio:local": "npx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- npx drizzle-kit studio --config drizzle.config.local.ts",
-    "drizzle:seed": "npx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- npx tsx ./drizzle/seed.ts",
+    "deploy": "nuxt build && bunx wrangler --cwd .output deploy",
+    "drizzle:generate": "bunx drizzle-kit generate",
+    "drizzle:migrate": "bunx drizzle-kit migrate",
+    "drizzle:migrate:local": "bunx wrangler d1 migrations apply worker-test",
+    "drizzle:studio": "bunx drizzle-kit studio",
+    "drizzle:studio:local": "bunx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- bunx drizzle-kit studio --config drizzle.config.local.ts",
+    "drizzle:seed": "bunx dotenv-cli -v DATABASE_URL=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) -- bunx tsx ./drizzle/seed.ts",
     "liam:generate": "tbls out -t json -o liam/schema.json $(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit)",
-    "liam:view": "npx @liam-hq/cli erd build --format=tbls --input liam/schema.json && npx serve dist/"
+    "liam:view": "bunx @liam-hq/cli erd build --format=tbls --input liam/schema.json && bunx serve dist/"
   },
   "dependencies": {
     "@internationalized/date": "^3.10.0",
@@ -24,6 +26,7 @@
     "@miniflare/shared": "^2.14.4",
     "@nuxt/icon": "^2.1.0",
     "@nuxt/ui": "^4.1.0",
+    "@tauri-apps/api": "^2.10.1",
     "better-sqlite3": "^12.4.1",
     "drizzle-orm": "^0.44.7",
     "drizzle-seed": "^0.3.1",
@@ -36,10 +39,11 @@
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.10.1",
     "@types/better-sqlite3": "^7.6.13",
     "@vite-pwa/nuxt": "^1.1.0",
     "drizzle-kit": "^0.31.7",
-    "nitro-cloudflare-dev": "^0.2.2",
+    "node-gyp": "^12.2.0",
     "tsx": "^4.20.6",
     "wrangler": "^4.47.0"
   }
