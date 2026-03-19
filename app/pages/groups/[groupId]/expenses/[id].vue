@@ -119,5 +119,5 @@ definePageMeta({
 });
 
 // TODO: I couldn't figure out how to make nested routes in the API side
-const { data: expense } = await useFetch(`/api/expenses/${route.params.id}`);
+const { data: expense } = await useAuthFetch(`/api/expenses/${route.params.id}`);
 </script>

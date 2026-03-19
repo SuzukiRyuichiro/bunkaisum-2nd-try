@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="px-2 py-8">
       <div class="flex items-center gap-3">
-        <p class="text-4xl cursor-pointer" @dblclick="logout">💸</p>
+        <p class="text-4xl cursor-pointer" @dblclick="handleLogout">💸</p>
         <div>
           <h1 className="text-slate-900">Bunkaisum</h1>
           <p className="text-sm text-slate-600">みんなで割り勘アプリ</p>
@@ -26,13 +26,12 @@
 <script setup lang="ts">
 import GroupCardList from "~/components/groups/GroupCardList.vue";
 
-const { clear } = useUserSession();
-const { status, data: groups } = await useFetch("/api/groups");
+const { logout } = useAuth();
+const { status, data: groups } = await useAuthFetch("/api/groups");
 
 const router = useRouter();
 
-const logout = () => {
-  clear();
-  router.push("/login");
+const handleLogout = () => {
+  logout();
 };
 </script>
