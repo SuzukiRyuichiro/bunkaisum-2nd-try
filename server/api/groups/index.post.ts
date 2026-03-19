@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle(event);
 
   const { name, emoji, userIds } = await readBody(event);
-  const { user } = await requireUserSession(event);
+  const userId = (event.context.user as { userId: number })?.userId;
 
-  if (!user) {
+  if (!userId) {
     throw createError({
       statusCode: 401,
       statusMessage: "You must be logged in to create a group",
