@@ -1,5 +1,8 @@
+const isTauri = process.env.TAURI_BUILD === "1";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: !isTauri,
   compatibilityDate: "2025-07-15",
   devtools: {
     enabled: true,
@@ -8,21 +11,16 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  modules: [
-    "nitro-cloudflare-dev",
-    "@nuxt/ui",
-    "@nuxt/icon",
-    "nuxt-auth-utils",
-    "@vite-pwa/nuxt",
-  ],
+  modules: ["@nuxt/ui", "@nuxt/icon", "nuxt-auth-utils", "@vite-pwa/nuxt"],
   css: ["~/assets/css/main.css"],
   runtimeConfig: {
     public: {
       enableEmojiSuggestions: true,
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "",
     },
   },
   nitro: {
-    preset: "cloudflare-module",
+    preset: isTauri ? "static" : "cloudflare-module",
     cloudflare: {
       deployConfig: true,
       nodeCompat: true,
@@ -30,6 +28,9 @@ export default defineNuxtConfig({
   },
   ui: {
     colorMode: false,
+  },
+  experimental: {
+    payloadExtraction: false,
   },
   pwa: {
     registerType: "autoUpdate",
