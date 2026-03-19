@@ -1,24 +1,24 @@
 <template>
   <div class="h-screen grid place-items-center">
-    <AuthState v-slot="{ loggedIn, clear }">
-      <div v-if="loggedIn" class="grid gap-2">
-        <UButton class="justify-center" @click="clear">Logout</UButton>
-        <UButton class="justify-center" to="/">Go home</UButton>
-      </div>
-      <UButton
-        v-else
-        icon="i-simple-icons-line"
-        size="md"
-        class="bg-[#06c755] hover:bg-[#04b54e]"
-        variant="solid"
-        @click="handleLogin"
-        >LINEでログイン</UButton
-      >
-    </AuthState>
+    <div v-if="loggedIn" class="grid gap-2">
+      <UButton class="justify-center" @click="logout">Logout</UButton>
+      <UButton class="justify-center" to="/">Go home</UButton>
+    </div>
+    <UButton
+      v-else
+      icon="i-simple-icons-line"
+      size="md"
+      class="bg-[#06c755] hover:bg-[#04b54e]"
+      variant="solid"
+      @click="handleLogin"
+      >LINEでログイン</UButton
+    >
   </div>
 </template>
 
 <script setup lang="ts">
+const { loggedIn, logout } = useAuth();
+
 const lineLoginUrl = computed(() => {
   const state =
     Math.random().toString(36).substring(2, 15) +

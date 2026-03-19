@@ -42,12 +42,12 @@ definePageMeta({
 const router = useRouter();
 const route = useRoute();
 
-const { data: group } = await useFetch(`/api/groups/${route.params.id}`);
-const { data: expenses } = await useFetch(
+const { data: group } = await useAuthFetch(`/api/groups/${route.params.id}`);
+const { data: expenses } = await useAuthFetch(
   `/api/groups/${route.params.id}/expenses`
 );
 
-const { data } = await useFetch(`/api/groups/${route.params.id}/balances`);
+const { data } = await useAuthFetch(`/api/groups/${route.params.id}/balances`);
 const { settlements, balances } = data.value || {
   settlements: [],
   balances: [],

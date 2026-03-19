@@ -13,13 +13,20 @@ export default defineEventHandler(async (event) => {
   }
 
   const { expense, involvements } = await readBody(event);
-  const { user } = await requireUserSession(event);
+  const userId = (event.context.user as { userId: number })?.userId;
+
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
 
   // Insert expense with groupId
   const [newExpense] = await db
     .insert(expensesTable)
     .values({
-      userId: user.id,
+      userId: userId,
       groupId: parseInt(groupId),
       ...expense
     })

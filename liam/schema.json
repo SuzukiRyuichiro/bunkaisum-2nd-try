@@ -502,6 +502,16 @@
           "type": "INTEGER",
           "nullable": false,
           "default": "unixepoch()"
+        },
+        {
+          "name": "emoji",
+          "type": "TEXT",
+          "nullable": true
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
         }
       ],
       "constraints": [
@@ -513,9 +523,22 @@
           "columns": [
             "id"
           ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "groups",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
         }
       ],
-      "def": "CREATE TABLE `groups` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`name` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n)"
+      "def": "CREATE TABLE `groups` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`name` text,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL\n, `emoji` text, `userId` integer REFERENCES users(id))"
     },
     {
       "name": "groupMembers",
@@ -587,6 +610,79 @@
         }
       ],
       "def": "CREATE TABLE `groupMembers` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`userId` integer,\n\t`groupId` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,\n\tFOREIGN KEY (`groupId`) REFERENCES `groups`(`id`) ON UPDATE no action ON DELETE no action\n)"
+    },
+    {
+      "name": "refreshTokens",
+      "type": "table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "token",
+          "type": "TEXT",
+          "nullable": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "INTEGER",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "unixepoch()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "refreshTokens_token_unique",
+          "def": "CREATE UNIQUE INDEX `refreshTokens_token_unique` ON `refreshTokens` (`token`)",
+          "table": "refreshTokens",
+          "columns": [
+            "token"
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "name": "id",
+          "type": "PRIMARY KEY",
+          "def": "PRIMARY KEY (id)",
+          "table": "refreshTokens",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "- (Foreign key ID: 0)",
+          "type": "FOREIGN KEY",
+          "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE",
+          "table": "refreshTokens",
+          "referenced_table": "users",
+          "columns": [
+            "userId"
+          ],
+          "referenced_columns": [
+            "id"
+          ]
+        }
+      ],
+      "def": "CREATE TABLE `refreshTokens` (\n\t`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,\n\t`userId` integer,\n\t`token` text NOT NULL,\n\t`expiresAt` integer,\n\t`createdAt` integer DEFAULT (unixepoch()) NOT NULL,\n\t`updatedAt` integer DEFAULT (unixepoch()) NOT NULL,\n\tFOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action\n)"
     }
   ],
   "relations": [
@@ -656,6 +752,19 @@
       "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
     },
     {
+      "table": "groups",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
       "table": "groupMembers",
       "columns": [
         "groupId"
@@ -670,6 +779,19 @@
     },
     {
       "table": "groupMembers",
+      "columns": [
+        "userId"
+      ],
+      "cardinality": "zero_or_more",
+      "parent_table": "users",
+      "parent_columns": [
+        "id"
+      ],
+      "parent_cardinality": "zero_or_one",
+      "def": "FOREIGN KEY (userId) REFERENCES users (id) ON UPDATE NO ACTION ON DELETE NO ACTION MATCH NONE"
+    },
+    {
+      "table": "refreshTokens",
       "columns": [
         "userId"
       ],

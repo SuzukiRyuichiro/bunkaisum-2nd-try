@@ -162,6 +162,13 @@
       "when": 1764905833697,
       "tag": "0022_misty_tomorrow_man",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1767605933804,
+      "tag": "0023_tearful_dragon_lord",
+      "breakpoints": true
     }
   ]
 }

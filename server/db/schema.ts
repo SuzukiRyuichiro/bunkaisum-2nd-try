@@ -72,6 +72,14 @@ export const groupMembersTable = sqliteTable("groupMembers", {
   ...timestamps,
 });
 
+export const refreshTokens = sqliteTable("refreshTokens", {
+  id: int().primaryKey({ autoIncrement: true }),
+  userId: int("userId").references(() => usersTable.id),
+  token: text("token").notNull().unique(),
+  expiresAt: int("expiresAt", { mode: "timestamp" }),
+  ...timestamps
+})
+
 // Relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
   expenses: many(expensesTable),
@@ -153,3 +161,4 @@ export const balanceView = sqliteView("balanceView").as((queryBuilder) =>
     .having(({ netBalance }) => ne(netBalance, 0))
     .orderBy(asc(sql`"netBalance"`))
 );
+

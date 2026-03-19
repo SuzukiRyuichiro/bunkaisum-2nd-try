@@ -114,7 +114,8 @@ const suggestEmoji = async () => {
   // If emoji is already chosen, don't change
   if (formState.value.emoji !== "") return;
 
-  const emoji = await $fetch("/api/emojis/suggest", {
+  const { authFetch } = useApi();
+  const emoji = await authFetch<string>("/api/emojis/suggest", {
     method: "POST",
     body: { title: formState.value.name },
   });
@@ -125,10 +126,11 @@ const suggestEmoji = async () => {
 };
 
 const route = useRoute();
-const { data: users } = await useFetch(`/api/users`);
+const { authFetch } = useApi();
+const { data: users } = await useAuthFetch(`/api/users`);
 
 const addGroup = async () => {
-  const response = await $fetch("/api/groups", {
+  const response = await authFetch<any>("/api/groups", {
     method: "POST",
     body: JSON.stringify(formState.value),
   });
