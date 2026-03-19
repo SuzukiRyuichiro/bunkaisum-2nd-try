@@ -1,27 +1,36 @@
 {
-  "name": "worker-test",
-  "main": "./.output/server/index.mjs",
-  "compatibility_date": "2025-11-12",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "db",
-      "database_name": "worker-test",
-      "database_id": "50667758-7490-4374-b1c3-13338a3332d0",
-      "migrations_dir": "drizzle"
-    }
-  ],
-  "observability": {
-    "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1,
-      "invocation_logs": true,
-      "persist": true
-    },
-    "traces": {
-      "enabled": true,
-      "head_sampling_rate": 1,
-      "persist": true
-    }
-  }
+	"name": "worker-test",
+	"main": "./.output/server/index.mjs",
+	"compatibility_date": "2025-11-12",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "db",
+			"database_name": "worker-test",
+			"database_id": "50667758-7490-4374-b1c3-13338a3332d0",
+			"migrations_dir": "drizzle"
+		}
+	],
+	"observability": {
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1,
+			"invocation_logs": true,
+			"persist": true
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 1,
+			"persist": true
+		}
+	},
+	"routes": [
+		{
+			"pattern": "split.ryuichirosuzuki.com",
+			"zone_name": "ryuichirosuzuki.com",
+			"custom_domain": true
+		}
+	]
 }
