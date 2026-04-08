@@ -1,5 +1,5 @@
 <template>
-  <Card>
+  <Card :delay="delay">
     <div class="flex gap-4 items-center">
       <p class="text-3xl">{{ group?.emoji }}</p>
       <div class="grow">
@@ -20,5 +20,5 @@
 
 <script setup lang="ts">
 import Card from "~/components/misc/Card.vue";
-defineProps<{ group: any }>();
+defineProps<{ group: any; delay?: number }>();
 </script>

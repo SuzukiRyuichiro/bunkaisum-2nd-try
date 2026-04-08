@@ -2,7 +2,8 @@
   <NuxtLink :to="to">
     <button
       v-if="expense"
-      class="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 hover:border-slate-300 text-left"
+      class="animate-card w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 hover:border-slate-300 text-left"
+      :style="{ animationDelay: `${delay}ms` }"
     >
       <div class="flex items-center gap-4">
         <div class="text-3xl">
@@ -37,8 +38,9 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{
+const props = defineProps<{
   expense: ExpenseWithUser;
   to: Object;
+  delay?: number;
 }>();
 </script>

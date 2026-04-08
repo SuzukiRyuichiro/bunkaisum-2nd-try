@@ -7,6 +7,7 @@
       v-for="(expense, index) in expenses"
       :expense="expense"
       :key="index"
+      :delay="index * 50"
       :to="{
         name: 'groups-groupId-expenses-id',
         params: { groupId: expense?.groupId, id: expense?.id },

@@ -1,7 +1,11 @@
 <template>
   <div class="grid gap-3 w-full">
     <template v-if="balances.length > 0">
-      <Card class="flex w-full items-center" v-for="balance in balances">
+      <Card
+        class="flex w-full items-center"
+        v-for="(balance, index) in balances"
+        :delay="index * 50"
+      >
         <div class="grow flex gap-4 items-center">
           <UAvatar
             :src="

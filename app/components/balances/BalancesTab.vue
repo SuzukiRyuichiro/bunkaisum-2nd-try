@@ -10,7 +10,10 @@
       </template>
       <template #body>
         <div class="grid gap-4 px-8 py-4">
-          <Card v-for="settlement in settlements || []">
+          <Card
+            v-for="(settlement, index) in settlements || []"
+            :delay="index * 100"
+          >
             <div class="grid grid-cols-[1fr_1rem_1fr] items-center">
               <div class="flex items-center gap-4">
                 <UAvatar

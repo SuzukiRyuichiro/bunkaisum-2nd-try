@@ -10,7 +10,7 @@
       class="grid gap-4"
       @submit="addGroup"
     >
-      <Card>
+      <Card :delay="0">
         <UFormField label="名前" name="name">
           <UInput
             class="w-full"
@@ -23,7 +23,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="100">
         <UFormField label="絵文字を選んでね" name="emoji">
           <URadioGroup
             indicator="hidden"
@@ -41,7 +41,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="200">
         <UFormField label="参加者" name="userIds">
           <UCheckboxGroup
             v-model="formState.userIds"

@@ -9,7 +9,7 @@
       :state="formState"
       @submit="handleFormSubmit"
     >
-      <Card>
+      <Card :delay="0">
         <UFormField label="件名" name="title">
           <UInput
             class="w-full"
@@ -22,7 +22,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="50">
         <UFormField label="絵文字を選んでね" name="emoji">
           <URadioGroup
             indicator="hidden"
@@ -40,7 +40,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="100">
         <UFormField label="支払った日" name="paidAt">
           <UPopover>
             <UButton
@@ -58,7 +58,7 @@
           </UPopover>
         </UFormField>
       </Card>
-      <Card>
+      <Card :delay="150">
         <UFormField
           name="totalAmount"
           :ui="{ label: 'flex w-full justify-between align-center' }"
@@ -130,7 +130,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="200">
         <UFormField label="支払った人" name="payerId">
           <USelect
             placeholder="一人選んでください"
@@ -144,7 +144,7 @@
         </UFormField>
       </Card>
 
-      <Card>
+      <Card :delay="250">
         <UFormField label="参加者" name="participantIds">
           <UCheckboxGroup
             v-model="formState.participantIds"
@@ -173,7 +173,7 @@
         </UFormField>
       </Card>
 
-      <Card ref="splitFormCard">
+      <Card ref="splitFormCard" :delay="300">
         <UFormField
           label="割り勘の方法"
           name="splitType"
