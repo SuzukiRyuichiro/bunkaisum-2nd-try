@@ -7,12 +7,12 @@
     </div>
   </div>
   <div class="grid gap-4 mt-8">
-    <Card class="grid gap-3">
+    <Card class="grid gap-3 animate-card" style="animation-delay: 0ms">
       <h3>合計額</h3>
       <h2 class="text-3xl font-bold">¥ {{ expense?.totalAmount }}</h2>
     </Card>
 
-    <Card>
+    <Card class="animate-card" style="animation-delay: 100ms">
       <template v-slot:tag>
         <p class="mt-3">支払った人</p>
       </template>
@@ -50,7 +50,7 @@
         </p>
       </div>
     </Card>
-    <Card>
+    <Card class="animate-card" style="animation-delay: 200ms">
       <template v-slot:tag>
         <div class="flex gap-2 mt-4">
           <p>詳細</p>
@@ -92,7 +92,7 @@
         </div>
       </div>
     </Card>
-    <Card>
+    <Card class="animate-card" style="animation-delay: 300ms">
       <template v-slot:tag>
         <p class="mt-3">備考</p>
       </template>
@@ -121,3 +121,29 @@ definePageMeta({
 // TODO: I couldn't figure out how to make nested routes in the API side
 const { data: expense } = await useAuthFetch(`/api/expenses/${route.params.id}`);
 </script>
+
+<style scoped>
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card {
+  opacity: 0;
+  animation: fade-in-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-card {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+</style>
