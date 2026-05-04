@@ -2,7 +2,7 @@ const isTauri = process.env.TAURI_BUILD === "1";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  ssr: !isTauri,
+  ssr: false,
   compatibilityDate: "2025-07-15",
   devtools: {
     enabled: true,
@@ -88,11 +88,5 @@ export default defineNuxtConfig({
       navigateFallback: "/",
       type: "module",
     },
-  },
-  routeRules: {
-    "/login": { prerender: true },
-    "/about": { prerender: true },
-    "/groups": { swr: true },
-    "/groups/*": { swr: true },
   },
 });
