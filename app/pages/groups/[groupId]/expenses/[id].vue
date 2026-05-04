@@ -102,7 +102,7 @@
           new Intl.DateTimeFormat("ja-JP", {
             dateStyle: "full",
             timeStyle: "medium",
-          }).format(new Date(expense?.createdAt))
+          }).format(new Date(expense?.createdAt || null))
         }}
         に記録しました
       </p>
