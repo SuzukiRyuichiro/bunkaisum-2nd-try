@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      "csp": "default-src 'self'; connect-src 'self' https://split.ryuichirosuzuki.com https://api.iconify.design https://access.line.me; img-src 'self' data: https://api.iconify.design https://access.line.me; style-src 'self' 'unsafe-inline'; script-src 'self' https://access.line.me"
     }
   },
   "bundle": {

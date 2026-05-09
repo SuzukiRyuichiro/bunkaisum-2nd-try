@@ -34,6 +34,7 @@ export const useAuth = () => {
 
     try {
       const data = await $fetch<User>("/api/users/me", {
+        baseURL: useRuntimeConfig().public.apiBase,
         headers: {
           Authorization: `Bearer ${token}`,
         },

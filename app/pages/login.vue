@@ -18,12 +18,16 @@
 
 <script setup lang="ts">
 const { loggedIn, logout } = useAuth();
+const config = useRuntimeConfig();
 
 const lineLoginUrl = computed(() => {
   const state =
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
-  return `/api/auth/line?state=${state}`;
+  const base = config.public.apiBase || "";
+  const isTauriOrigin = window.location.origin.startsWith("tauri://") || window.location.origin.startsWith("http://tauri.localhost") || window.location.origin.startsWith("app://");
+  const tauriParam = isTauriOrigin ? "&tauri=1" : "";
+  return `${base}/api/auth/line?state=${state}${tauriParam}`;
 });
 
 const handleLogin = () => {

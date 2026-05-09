@@ -19,6 +19,7 @@ export const useApi = () => {
     try {
       return await $fetch<T>(url, {
         ...options,
+        baseURL: config.public.apiBase,
         headers: {
           ...options.headers,
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -50,6 +51,7 @@ export const useAuthFetch = <T>(
 
   return useFetch<T>(url, {
     ...options,
+    baseURL: useRuntimeConfig().public.apiBase,
     headers: computed(() => {
       const token =
         accessToken.value ||

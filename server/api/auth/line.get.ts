@@ -12,7 +12,11 @@ export default defineOAuthLineEventHandler({
     });
 
     if (!ourUser) {
-      throw createError({ statusCode: 500, statusMessage: "Failed to create user" });
+      console.log("hey we failed");
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Failed to create user",
+      });
     }
 
     const db = useDrizzle(event);
@@ -25,6 +29,13 @@ export default defineOAuthLineEventHandler({
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
-    return sendRedirect(event, `/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`);
+    const query = getQuery(event);
+    const isTauri = query.tauri === "1";
+    const redirectBase = isTauri ? "tauri://localhost" : "";
+
+    return sendRedirect(
+      event,
+      `${redirectBase}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`,
+    );
   },
 });
